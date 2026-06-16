@@ -1,0 +1,202 @@
+@import 'tailwindcss';
+@import 'fumadocs-ui/css/black.css';
+@import 'fumadocs-ui/css/preset.css';
+
+/* ==========================================================================
+   TAILWIND V4 SEMANTIC TOKEN REGISTRY (Syncs Buttons & Layout Components)
+   ========================================================================== */
+@theme {
+  --spacing-page: 1436px;
+  --color-brand: hsl(26, 73%, 51%);
+  --color-brand-foreground: white;
+  --color-brand-secondary: #c6bb58;
+  --color-brand-secondary-foreground: #97890c;
+  --color-brand-200: hsl(33, 100%, 50%);
+
+  --color-landing-foreground: #59592a;
+  --color-landing-foreground-200: #a8a866;
+
+  /* Exposes custom theme properties directly to standard utility engines */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+@theme inline {
+  --default-mono-font-family: var(--font-mono);
+  --animate-marquee: marquee var(--duration) infinite linear;
+  --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
+  
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(calc(-100% - var(--gap))); }
+  }
+  
+  @keyframes marquee-vertical {
+    from { transform: translateY(0); }
+    to { transform: translateY(calc(-100% - var(--gap))); }
+  }
+
+  @keyframes stroke {
+    from { stroke-dasharray: 1000; }
+    to { stroke-dasharray: 1000; stroke-dashoffset: 2000; }
+  }
+
+  --animate-stroke: stroke 5s linear infinite;
+  
+  --color-gradient-radial: radial-gradient(circle, var(--tw-gradient-stops));
+  --color-repeat-gradient-to-r: repeating-linear-gradient(to right, var(--tw-gradient-stops));
+  --color-repeat-gradient-to-br: repeating-linear-gradient(
+    to bottom right,
+    var(--tw-gradient-stops)
+  );
+}
+
+/* ==========================================================================
+   LIGHT MODE SYSTEM CONSTANTS
+   ========================================================================== */
+:root {
+  /* --- Palette Storage Matrix --- */
+  --accent0: hsl(262, 83%, 58%);        /* 0. Deep Amethyst */
+  --am0: rgba(139, 92, 246, 0.1);
+  --accent1: hsl(38, 92%, 50%);         /* 1. Deep Amber */
+  --am1: rgba(245, 158, 11, 0.1);
+  --accent2: hsl(342, 85%, 48%);        /* 2. Deep Rose Red */
+  --am2: rgba(225, 29, 72, 0.1);
+  --accent3: hsl(142, 72%, 40%);        /* 3. Deep Mint */
+  --am3: rgba(16, 185, 129, 0.1);
+  --accent4: hsl(187, 90%, 42%);        /* 4. Deep Teal */
+  --am4: rgba(6, 182, 212, 0.1);
+
+  /* Workspace Control Selection Pointer */
+  --active-accent: var(--accent0);      
+  --active-accent-muted: var(--am0);
+
+  /* Synchronizes layout components */
+  --color-fd-primary: var(--active-accent);
+  --color-fd-primary-muted: var(--active-accent-muted);
+
+  /* Layout Injections */
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(240, 10%, 3.9%);
+
+  /* Button Engine Overrides */
+  --primary: #000;
+  --primary-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(240, 4.8%, 95.9%);
+  --secondary-foreground: hsl(240, 5.9%, 10%);
+  --accent: hsl(240, 4.8%, 95.9%);
+  --accent-foreground: hsl(240, 5.9%, 10%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 5.9%, 90%);
+  --input: hsl(240, 5.9%, 90%);
+  --ring: var(--active-accent);
+
+  /* icons */
+  --mdx-icon-color: var(--active-accent);
+}
+
+/* ==========================================================================
+   DARK MODE SYSTEM CONSTANTS
+   ========================================================================== */
+.dark {
+  --color-landing-foreground: #e4e2d0;
+  --color-landing-foreground-200: #b7af7e;
+  --color-brand: #fff383;
+  --color-brand-secondary: #fc7744;
+  --color-brand-secondary-foreground: #521700;
+  --color-brand-foreground: black;
+  --color-brand-200: #fff7c8;
+
+  /* --- Palette Storage Matrix --- */
+  --accent0: hsl(262, 85%, 68%);        /* 0. Smooth Lavender */
+  --am0: rgba(167, 139, 250, 0.15);
+  --accent1: hsl(43, 96%, 64%);         /* 1. Vibrant Gold */
+  --am1: rgba(251, 191, 36, 0.15);
+  --accent2: hsl(342, 90%, 65%);        /* 2. Luminous Electric Rose */
+  --am2: rgba(244, 63, 94, 0.15);
+  --accent3: hsl(150, 85%, 65%);        /* 3. Luminous Sage */
+  --am3: rgba(52, 211, 153, 0.15);
+  --accent4: hsl(190, 95%, 68%);        /* 4. Electric Ice Cyan */
+  --am4: rgba(34, 211, 238, 0.15);
+
+  /* Workspace Control Selection Pointer */
+  --active-accent: var(--accent0);      
+  --active-accent-muted: var(--am0);
+
+  /* Synchronizes layout components */
+  --color-fd-primary: var(--active-accent);
+  --color-fd-primary-muted: var(--active-accent-muted);
+
+  /* Layout Injections */
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+
+  /* Button Engine Overrides */
+  --primary: #f4f1f8;
+  --primary-foreground: hsl(240, 5.9%, 10%);
+  --secondary: hsl(240, 3.7%, 15.9%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 3.7%, 15.9%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 18%);
+  --input: hsl(240, 3.7%, 18%);
+  --ring: var(--active-accent);
+  
+  /* icons */
+  --mdx-icon-color: var(--active-accent);
+
+}
+
+/* ==========================================================================
+   UTILITY ENGINES & KEYFRAMES
+   ========================================================================== */
+html {
+  scrollbar-gutter: stable;
+}
+
+html > body[data-scroll-locked] {
+  margin-right: 0px !important;
+  --removed-body-scroll-bar-size: 0px !important;
+}
+
+body {
+  background-color: var(--background) !important;
+  color: var(--foreground);
+}
+
+@keyframes circuit_1 {
+  0% { transform: translateY(-20px); }
+  100% { transform: translateY(100px); }
+}
+
+@keyframes circuit_1_x_energy {
+  0%, 46% { opacity: 0; transform: translateX(-20px); }
+  47%, 70% { opacity: 100%; }
+  100% { opacity: 0; transform: translateX(212px); }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+}
+
+/*-------------------------------*/
+
+.m-icon {
+  color: var(--mdx-icon-color);
+}

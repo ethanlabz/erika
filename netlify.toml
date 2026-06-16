@@ -1,0 +1,35 @@
+# Netlify configuration file for modern Next.js project
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  # Pin modern LTS Node version (required for Next 16+ & React 19)
+  NODE_VERSION = "20"
+  
+  # Disable source maps in production to optimize build speeds and reduce bundle size
+  NEXT_DISABLE_SOURCEMAPS = "true"
+
+# Cache-Control settings for optimized asset delivery
+[[headers]]
+  # Cache Next.js built static assets (JS/CSS/Web Web-manifests) forever as they are hashed
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  # Cache public static PDF assets (syllabus, etc.)
+  for = "/pdf/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, must-revalidate"
+
+[[headers]]
+  # Global security headers for protection
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=(), interest-cohort=()"
