@@ -108,8 +108,8 @@ export function PDFViewer({
               onChange={(e) => handleThemeUpdate(e.target.value as PDFTheme)}
               className="bg-background text-foreground text-xs font-medium border border-border rounded-md px-2 py-1 outline-hidden cursor-pointer transition-colors duration-150 hover:bg-accent"
             >
-              <option value="light">Light (Sepia)</option>
-              <option value="dark">Charcoal Dark</option>
+              <option value="light">Light Mode</option>
+              <option value="dark">Dark Mode</option>
             </select>
           </div>
 
