@@ -1,0 +1,27 @@
+backend:
+  name: git-gateway
+  branch: main # Change this if your default branch is 'master'
+
+# Where your uploaded images will go
+media_folder: "public/images"
+public_folder: "/images"
+
+collections:
+  - name: "docs"
+    label: "Documentation (MDX)"
+    folder: "content/docs"
+    create: true
+    extension: "mdx"
+    format: "frontmatter"
+    # This allows users to create files inside nested folders (like /core, /labs)
+    nested:
+      depth: 3
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - {
+          label: "Description",
+          name: "description",
+          widget: "text",
+          required: false,
+        }
+      - { label: "Body", name: "body", widget: "markdown" }
