@@ -15,7 +15,7 @@ import { gitConfig } from '@/lib/shared';
 
 // Buttons
 import { Button } from '@/components/ui/button';
-import { PDFViewer } from '@/components/pdf-viewer';
+import { PDFViewer } from '@/components/pdf-viewer.old';
 
 export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   const params = await props.params;
