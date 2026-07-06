@@ -1,8 +1,7 @@
 backend:
   name: git-gateway
-  branch: main # Change this if your default branch is 'master'
+  branch: main # (Change to master if your GitHub uses master)
 
-# Where your uploaded images will go
 media_folder: "public/images"
 public_folder: "/images"
 
@@ -13,9 +12,11 @@ collections:
     create: true
     extension: "mdx"
     format: "frontmatter"
-    # This allows users to create files inside nested folders (like /core, /labs)
+
+    # Tells the CMS to search through all your subfolders
     nested:
-      depth: 3
+      depth: 5
+
     fields:
       - { label: "Title", name: "title", widget: "string" }
       - {
@@ -24,4 +25,5 @@ collections:
           widget: "text",
           required: false,
         }
+      - { label: "Path", name: "path", widget: "hidden", required: false }
       - { label: "Body", name: "body", widget: "markdown" }
