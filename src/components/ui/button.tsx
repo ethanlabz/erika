@@ -4,19 +4,15 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  // FIX: Added 'not-prose' and 'no-underline' to block Fumadocs markdown style hijacking
-  "not-prose no-underline inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.03] active:translate-y-0 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background",
+  "not-prose no-underline inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.03] active:translate-y-0 active:scale-[0.97] [&_svg:not(.animate-spin)]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background",
   {
     variants: {
       variant: {
-        // Core Design Tokens
         default: "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 hover:shadow-md",
         secondary: "bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/90 hover:shadow-sm",
         outline: "border border-input bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/20 hover:shadow-sm",
         ghost: "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/20 active:bg-accent/40",
         link: "text-primary underline-offset-4 hover:underline hover:translate-y-0 hover:scale-100 p-0 h-auto",
-        
-        // Academic Status Themes
         destructive: "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90 hover:shadow-md",
         success: "bg-emerald-600 text-white shadow-sm hover:bg-emerald-600/90 dark:bg-emerald-500 dark:hover:bg-emerald-500/90 hover:shadow-md",
         warning: "bg-amber-500 text-black font-semibold shadow-sm hover:bg-amber-500/90 dark:text-white hover:shadow-md",
@@ -33,10 +29,15 @@ const buttonVariants = cva(
         "icon-sm": "size-8 rounded-md p-0",
         "icon-lg": "size-10 rounded-md p-0",
       },
+      disabled: {
+        true: "pointer-events-none opacity-50 shadow-none",
+        false: "", 
+      },
     },
     defaultVariants: {
       variant: "default",
       size: "default",
+      disabled: false,
     },
   }
 );
@@ -47,25 +48,55 @@ export interface ButtonProps
   href?: LinkProps["href"];
   target?: string;
   rel?: string;
+  /** Automatically shows a spinner and disables the button */
+  loading?: boolean; 
 }
 
 const Button = React.forwardRef<HTMLButtonElement & HTMLAnchorElement, ButtonProps>(
-  ({ className, variant, size, href, target, rel, ...props }, ref) => {
-    const combinedClasses = cn(buttonVariants({ variant, size, className }));
+  ({ className, variant, size, disabled, loading, href, target, rel, children, ...props }, ref) => {
+    
+    // 1. Force the button to be disabled if the loading state is active
+    const isCurrentlyDisabled = disabled || loading;
 
+    const combinedClasses = cn(buttonVariants({ variant, size, disabled: isCurrentlyDisabled, className }));
+
+    // 2. The standard Tailwind SVG spinner
+    const Spinner = (
+      <svg
+        className="animate-spin size-4 shrink-0"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+    );
+
+    // 3. Assemble the inner content
+    const content = (
+      <>
+        {loading && Spinner}
+        {children}
+      </>
+    );
+
+    // 4. Render Link or Button based on props
     if (href) {
       const isExternal = typeof href === "string" && (href.startsWith("http://") || href.startsWith("https://"));
       
       return (
         <Link
-          href={href}
+          href={isCurrentlyDisabled ? "#" : href}
           className={combinedClasses}
           target={isExternal ? "_blank" : target}
           rel={isExternal ? "noopener noreferrer" : rel}
           ref={ref as any}
+          aria-disabled={isCurrentlyDisabled}
+          tabIndex={isCurrentlyDisabled ? -1 : undefined}
           {...(props as any)}
         >
-          {props.children}
+          {content}
         </Link>
       );
     }
@@ -74,9 +105,12 @@ const Button = React.forwardRef<HTMLButtonElement & HTMLAnchorElement, ButtonPro
       <button
         className={combinedClasses}
         ref={ref}
+        disabled={isCurrentlyDisabled}
         type={props.type || "button"}
         {...props}
-      />
+      >
+        {content}
+      </button>
     );
   }
 );

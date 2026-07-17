@@ -5,7 +5,7 @@ import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 
 // component injections
 import { Button, buttonVariants } from '@/components/ui/button';
-import { PDFViewer } from '@/components/pdf-viewer';
+import { DocViewer } from '@/components/ui/doc-viewer';
 
 export function getMDXComponents(components?: MDXComponents) {
   return {
@@ -19,8 +19,8 @@ export function getMDXComponents(components?: MDXComponents) {
     Button,
     buttonVariants,
 
-    // pdf viewer
-    PDFViewer,
+    // doc viewer
+    DocViewer,
   } satisfies MDXComponents;
 }
 

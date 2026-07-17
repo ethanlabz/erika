@@ -15,7 +15,7 @@ import { gitConfig } from '@/lib/shared';
 
 // Buttons
 import { Button } from '@/components/ui/button';
-import { PDFViewer } from '@/components/pdf-viewer.old';
+import { DocViewer } from '@/components/ui/doc-viewer';
 
 export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   const params = await props.params;
@@ -49,7 +49,7 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
             
             // component injections
             Button, 
-            PDFViewer,
+            DocViewer,
           })}
         />
       </DocsBody>

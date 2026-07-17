@@ -34,9 +34,12 @@ export default function LandingPage() {
         </div>
 
         {/* Master Call To Action Controls Grid */}
-        <div className="flex items-center gap-3.5 flex-wrap justify-center w-full animate-fade-in-up">
-          <Button href="/docs" size="lg" className="shadow-md tracking-wide px-7 font-semibold">
-            Explore Documentation
+        <div className="flex items-center gap-3.5 flex-wrap justify-center w-full animate-fade-in-up flex-direction-column uppercase">
+          <Button href="/docs/v" size="lg" variant="default">
+            Semester V
+          </Button>
+          <Button href="/docs/vi" size="lg" variant="outline" disabled>
+            Semester VI
           </Button>
         </div>
 
