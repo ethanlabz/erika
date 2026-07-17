@@ -31,7 +31,7 @@ const buttonVariants = cva(
       },
       disabled: {
         true: "pointer-events-none opacity-50 shadow-none",
-        false: "", 
+        false: "",
       },
     },
     defaultVariants: {
@@ -43,18 +43,20 @@ const buttonVariants = cva(
 );
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "disabled">,
+  VariantProps<typeof buttonVariants> {
   href?: LinkProps["href"];
   target?: string;
   rel?: string;
   /** Automatically shows a spinner and disables the button */
-  loading?: boolean; 
+  loading?: boolean;
+  /** Declares "disabled" strictly as a boolean for safety */
+  disabled?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement & HTMLAnchorElement, ButtonProps>(
   ({ className, variant, size, disabled, loading, href, target, rel, children, ...props }, ref) => {
-    
+
     // 1. Force the button to be disabled if the loading state is active
     const isCurrentlyDisabled = disabled || loading;
 
@@ -84,7 +86,7 @@ const Button = React.forwardRef<HTMLButtonElement & HTMLAnchorElement, ButtonPro
     // 4. Render Link or Button based on props
     if (href) {
       const isExternal = typeof href === "string" && (href.startsWith("http://") || href.startsWith("https://"));
-      
+
       return (
         <Link
           href={isCurrentlyDisabled ? "#" : href}
