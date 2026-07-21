@@ -1,59 +1,80 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+'use client'
+
+import { useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 
-export default async function LoginPage({ 
-  searchParams 
-}: { 
-  // 1. Update the type to reflect that searchParams is a Promise
-  searchParams: Promise<{ error?: string }> 
-}) {
-  // 2. Await the params before trying to read `.error`
-  const resolvedSearchParams = await searchParams;
-  
-  // Next.js Server Action
-  const logIn = async (formData: FormData) => {
-    'use server'
+export default function AuthPage() {
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
+  const supabase = createClient()
+
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+    
+    const formData = new FormData(e.currentTarget)
     const email = formData.get('email') as string
     const password = formData.get('password') as string
-    
-    const supabase = await createClient()
+
+    // 🟢 Hardcoded to ONLY allow sign-ins
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     
-    if (error) redirect('/login?error=true')
-    redirect('/docs')
+    if (error) {
+      setError(error.message)
+    } else {
+      router.push('/docs')
+      router.refresh() // Force Next.js to re-evaluate the layout with the new cookie
+    }
+    
+    setLoading(false)
   }
 
   return (
-    <div className="flex h-screen w-full items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md rounded-xl border border-border bg-card p-8 shadow-sm">
-        <h2 className="mb-6 text-2xl font-semibold tracking-tight text-foreground">Secure Access</h2>
+    <div className="flex min-h-screen w-full items-center justify-center bg-background p-4 sm:p-8">
+      {/* Animated Card Container */}
+      <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-border bg-card p-8 shadow-xl transition-all duration-500 hover:shadow-2xl">
         
-        {resolvedSearchParams?.error && (
-          <div className="mb-4 rounded-md bg-destructive/15 p-3 text-sm text-destructive">
-            Invalid email or password.
+        {/* Header */}
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">
+            Vault Access
+          </h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Enter your credentials to access the documents.
+          </p>
+        </div>
+
+        {error && (
+          <div className="mb-6 animate-in fade-in slide-in-from-top-2 rounded-lg bg-destructive/15 p-4 text-sm font-medium text-destructive">
+            {error}
           </div>
         )}
 
-        <form action={logIn} className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-foreground">Email</label>
+        {/* Email Form */}
+        <form onSubmit={handleLogin} className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-foreground">Email address</label>
             <input 
               type="email" name="email" required 
-              className="w-full rounded-md border border-input bg-background p-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary"
+              className="h-11 w-full rounded-lg border border-input bg-background px-4 text-sm text-foreground transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
-          
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-2">
             <label className="text-sm font-medium text-foreground">Password</label>
             <input 
               type="password" name="password" required 
-              className="w-full rounded-md border border-input bg-background p-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary"
+              className="h-11 w-full rounded-lg border border-input bg-background px-4 text-sm text-foreground transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
-          
-          <Button type="submit" className="mt-2 w-full">Sign In</Button>
+          <Button type="submit" className="mt-2 h-11" disabled={loading}>
+            {loading ? 'Authenticating...' : 'Sign In'}
+          </Button>
         </form>
+
       </div>
     </div>
   )

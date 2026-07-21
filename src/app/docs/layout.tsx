@@ -4,6 +4,9 @@ import { baseOptions } from '@/lib/layout.shared';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 
+// Logout button
+import { LogoutButton } from '@/components/auth/logout-button';
+
 export default async function Layout({ children }: LayoutProps<'/docs'>) {
   // 1. Initialize Supabase securely on the server
   const supabase = await createClient();
@@ -17,7 +20,12 @@ export default async function Layout({ children }: LayoutProps<'/docs'>) {
   }
 
   return (
-      <DocsLayout tree={source.getPageTree()} {...baseOptions()}>
+      <DocsLayout
+        tree={source.getPageTree()}
+        {...baseOptions()}
+        sidebar={{
+          footer: <LogoutButton key="logout-btn" />
+        }}>
         {children}
       </DocsLayout>
   );
