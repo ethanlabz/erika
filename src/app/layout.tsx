@@ -3,7 +3,7 @@ import './global.css';
 import { Inter } from 'next/font/google';
 import type { Metadata } from 'next';
 
-// Forces the server to run proxy.ts on every page load
+// 🟢 Forces the server to run proxy.ts on every page load
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
