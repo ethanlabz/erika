@@ -16,6 +16,8 @@
     "@base-ui/react": "^1.5.0",
     "@fuma-translate/react": "^0.0.3",
     "@radix-ui/react-collapsible": "^1.1.13",
+    "@supabase/ssr": "^0.12.3",
+    "@supabase/supabase-js": "^2.110.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "fumadocs-core": "16.9.3",
@@ -25,7 +27,7 @@
     "motion": "^12.40.0",
     "next": "16.2.6",
     "react": "^19.2.6",
-    "react-dom": "^19.2.6",
+    "react-dom": "^19.2.7",
     "shadcn": "^4.11.0",
     "simple-icons": "^16.23.0",
     "tailwind-merge": "^3.6.0",
@@ -41,5 +43,9 @@
     "postcss": "^8.5.15",
     "tailwindcss": "^4.3.0",
     "typescript": "^6.0.3"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true,
+    "sharp@0.34.5": true
   }
 }
