@@ -1,0 +1,117 @@
+---
+title: Experiment 1
+---
+
+## Aim
+> To configure the JDK environment, compile terminal-based programs, and evaluate arithmetic expressions involving primitive data types and operator precedence.
+
+
+## Theory
+
+1. **JDK Environment Setup**:
+    - **JDK (Java Development Kit)**: Contains tools needed to develop Java programs (includes `javac` compiler, `java` runner, and `jre`).
+    - **Compilation & Execution**: Java source code (`.java`) is compiled into bytecode (`.class`) by `javac`, which is then executed by the JVM (Java Virtual Machine).
+
+2. **Primitive Data Types**:
+    - Integral types: `byte` (1B), `short` (2B), `int` (4B), `long` (8B)
+    - Floating-point types: `float` (4B), `double` (8B)
+    - Character & Logical: `char` (2B), `boolean` (1-bit logical)
+
+3. **Operator Precedence & Type Promotion**:
+    - Operators with higher precedence (e.g., `*`, `/`, `%`) execute before lower precedence ones (`+`, `-`).
+    - Parentheses `()` override standard precedence rules.
+    - Arithmetic operations automatically promote smaller integer types (`byte`, `short`, `char`) to `int`.
+
+
+## Code
+
+```java
+public class Experiment1 {
+
+    public static void main(String[] args) {
+        System.out.println("==================================================");
+        System.out.println("            JAVA DATA TYPES & PRECEDENCE          ");
+        System.out.println("==================================================\n");
+
+        // 1. Primitive Data Type Declarations
+        byte b = 10;
+        short s = 200;
+        int i = 5000;
+        long l = 100000L;
+        float f = 10.5f;
+        double d = 99.99;
+        char c = 'A';
+        boolean isJavaFun = true;
+
+        System.out.println("--- Primitive Values ---");
+        System.out.println("byte: " + b + " | short: " + s + " | int: " + i);
+        System.out.println("long: " + l + " | float: " + f + " | double: " + d);
+        System.out.println("char: " + c + " | boolean: " + isJavaFun + "\n");
+
+        // 2. Operator Precedence Evaluation
+        int x = 10, y = 5, z = 2;
+
+        // Expression 1: Multiplication and Division take priority over Addition/Subtraction
+        int result1 = x + y * z;               // 10 + (5 * 2) = 20
+        int result2 = (x + y) * z;             // (10 + 5) * 2 = 30
+
+        // Expression 2: Mixed Arithmetic Precedence
+        int result3 = x * y + z / z - x;       // (10 * 5) + (2 / 2) - 10 = 50 + 1 - 10 = 41
+
+        System.out.println("--- Operator Precedence Results ---");
+        System.out.println("Expression 'x + y * z'        : " + result1);
+        System.out.println("Expression '(x + y) * z'      : " + result2);
+        System.out.println("Expression 'x * y + z / z - x': " + result3 + "\n");
+
+        // 3. Type Promotion & Explicit Casting
+        int sumInt = b + s;                    // Promoted to int automatically
+        double mixedExpr = (i * f) + (d / y);  // Promoted to double
+
+        System.out.println("--- Type Promotion & Evaluation ---");
+        System.out.println("Sum of byte and short (promoted to int): " + sumInt);
+        System.out.println("Mixed type expression result           : " + mixedExpr);
+        System.out.println("==================================================");
+    }
+}
+
+```
+
+
+## Commands
+
+```bash
+# 1. Compile the Java file
+javac Experiment1.java
+
+# 2. Run the compiled bytecode
+java Experiment1
+
+```
+
+
+## Expected Output
+
+```text
+==================================================
+         JAVA DATA TYPES & PRECEDENCE      
+==================================================
+  
+--- Primitive Values ---
+byte: 10 | short: 200 | int: 5000
+long: 100000 | float: 10.5 | double: 99.99
+char: A | boolean: true
+  
+--- Operator Precedence Results ---
+Expression 'x + y * z'        : 20
+Expression '(x + y) * z'      : 30
+Expression 'x * y + z / z - x': 41
+  
+--- Type Promotion & Evaluation ---
+Sum of byte and short (promoted to int): 210
+Mixed type expression result           : 52519.998046875
+==================================================
+
+```
+
+## Conclusion
+> \<conclusion here>
