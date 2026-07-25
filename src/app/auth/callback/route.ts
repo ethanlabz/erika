@@ -2,9 +2,8 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
 export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url)
+  const { searchParams } = new URL(request.url)
   const code = searchParams.get('code')
-  // By default, kick them to the docs folder upon successful auth
   const next = searchParams.get('next') ?? '/docs'
 
   if (code) {
@@ -12,10 +11,9 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`)
+      return NextResponse.redirect(new URL(next, request.url))
     }
   }
 
-  // If something goes wrong, return to login with an error
-  return NextResponse.redirect(`${origin}/login?error=true`)
+  return NextResponse.redirect(new URL('/login?error=true', request.url))
 }
