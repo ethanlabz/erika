@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || process.env.URL || 'http://truelytherapist.netlify.app'
+    process.env.NEXT_PUBLIC_SITE_URL || process.env.URL || 'http://eriklabs.netlify.app'
   ),
 };
 

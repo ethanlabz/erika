@@ -15,7 +15,7 @@ export async function middleware(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
           supabaseResponse = NextResponse.next({ request })
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
@@ -25,19 +25,17 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // Fetch the user's active session
   const { data: { user } } = await supabase.auth.getUser()
-
+  
   const isLoginPage = request.nextUrl.pathname.startsWith('/login')
+  const isAuthCallback = request.nextUrl.pathname.startsWith('/auth/callback')
 
-  // Rule 1: Not logged in? Go straight to the login page.
-  if (!user && !isLoginPage) {
+  if (!user && !isLoginPage && !isAuthCallback) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
   }
 
-  // Rule 2: Already logged in? You don't need to see the login page anymore.
   if (user && isLoginPage) {
     const url = request.nextUrl.clone()
     url.pathname = '/docs'
@@ -49,7 +47,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Protect every route EXCEPT static files (images, pdfs, Next.js background scripts)
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
