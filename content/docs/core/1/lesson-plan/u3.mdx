@@ -1,0 +1,297 @@
+---
+title: UNIT III
+---
+
+# Data Structures in Python
+
+**Core Curriculum Focus:** Sequential collections (Strings, Lists, Tuples), non-sequential collections (Dictionaries, Sets), list and dictionary comprehensions, nested matrices, regular expressions, and the standard library collections module.
+
+### **Textbook Priority Order**
+1. **B5:** *Core Python Programming* (Dr. R. Nageswara Rao, 2nd Edition) [B5]
+2. **B1:** *Python Programming: An Introduction to Computer Science* (John M. Zelle, 3rd Edition) [B1]
+3. **B3:** *Python Programming Using Problem Solving Approach* (Reema Thareja) [B3]
+4. **PDSH:** *Python Data Science Handbook* (Jake VanderPlas, 2nd Edition) [PDSH]
+
+---
+
+## MODULE 1: String Representations, Indexing, and Slicing with Stride
+
+### **Lesson Objective**
+Understand Python's string storage models (heap-allocated immutable character sequences), master positive/negative indexing boundaries, and apply step-stride slicing arithmetic (including string reversals) [B5 Page 207, B1 Page 129].
+
+### **Core Concepts**
+* **String Immutability:** Explain that strings are immutable heap objects. Any modification creates a new string object rather than modifying the existing character array in-place, which optimizes hashing stability and enables string interning [B5 Page 208].
+* **Memory Representation:** Contrast C’s null-terminated character array (`char[]` utilizing `\0`) with Python’s high-level `str` object, which caches length, hash values, and encodes characters using Unicode standard [B5 Page 403].
+* **Index Boundaries:** Trace indexing from `0` to `len(s)-1` (left-to-right) and negative indexing from `-1` to `-len(s)` (right-to-left) [B1 Page 131].
+* **Step-Stride Slicing:** Understand the slice syntax `s[start:stop:step]`. Explain that a negative step moves backward through the string and how `s[::-1]` performs a full string reversal [B5 Page 210, B1 Page 132].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B5:** Chapter 8 ("Strings and Characters") — String properties and indexing (pp. 207–210) [B5].
+    * **B1:** Chapter 5 ("Sequences: Strings, Lists, and Files") — Section 5.1 ("String Type") (pp. 129–133) [B1].
+    * **B3:** Chapter 6 ("Python Strings Revisited") — Slicing and negative indices (pp. 242–248) [B3].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Demonstrate step slicing mechanics and string immutability in the interactive shell:
+
+    ```python
+    # Define sequence elements
+    text = "Python-UGIE"
+
+    # Slicing with positive and negative step strides
+    print(text[0:6])    # Output: 'Python' (Standard slice)
+    print(text[::2])     # Output: 'Pto-GI' (Step stride of 2)
+    print(text[::-1])    # Output: 'EIGU-nohtyP' (Reversed)
+
+    # Prove immutability (reassignment vs in-place modification)
+    # text[0] = 'p'     # Raises TypeError: 'str' object does not support item assignment
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 2: Built-in String APIs and Regular Expressions
+
+### **Lesson Objective**
+Master built-in string methods for validation, search, splitting, and merging, and design basic regular expressions to extract patterns from unstructured text streams [B5 Page 215, B1 Page 147].
+
+### **Core Concepts**
+* **Validation & Search APIs:** Use boolean checkers like `.isalpha()`, `.isdigit()`, and `.islower()`, and search methods like `.find()`, `.count()`, and `.replace()` [B5 Page 215–220, B3 Page 250–252].
+* **Parsing & Joining:** Differentiate `.split()` (tokenizing strings into lists) from `.join()` (merging list items into a single string with a specified separator) [B1 Page 148].
+* **Regular Expressions (Regex):** Understand how the `re` module searches for text patterns using meta-characters: `\d` (digits), `\w` (alphanumerics), `+` (one-or-more), and `*` (zero-or-more) [B5 Page 491, B2 Page 147].
+* **Grouping and Capturing:** Use parentheses `()` inside a regex pattern to extract specific subsets of matches dynamically [B5 Page 492, B2 Page 151].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B5:** Chapter 8 ("Strings and Characters") — String Methods (pp. 215–225); Chapter 18 ("Regular Expressions") — Meta-characters and pattern extraction (pp. 491–494) [B5].
+    * **B1:** Chapter 5 — Section 5.6 ("Lists Have Methods, Too" — includes split/join) (pp. 147–150) [B1].
+    * **B3:** Chapter 6 — Section 6.4 ("Built-in String Methods and Functions") (pp. 249–254) [B3].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Parse a domain name from an email string using both standard string split methods and regular expressions:
+
+    ```python
+    import re
+
+    email = "student@ugie.edu"
+
+    # Method 1: String splitting
+    username, domain = email.split("@")
+    print("Domain (Split):", domain)  # Output: 'ugie.edu'
+
+    # Method 2: Regular Expression pattern matching
+    # Pattern: Match alphanumeric characters before and after '@'
+    pattern = r"(\w+)@(\w+\.\w+)"
+    match = re.search(pattern, email)
+    if match:
+        print("Username (Regex):", match.group(1))  # Output: 'student'
+        print("Domain (Regex):", match.group(2))    # Output: 'ugie.edu'
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 3: Lists: Creation, Mutability, and Memory Architecture
+
+### **Lesson Objective**
+Explain Python's contiguous heap-pointer list representation, analyze mutability behavior (append, insert, and delete), and contrast memory aliasing with cloning [B5 Page 283, B1 Page 366].
+
+### **Core Concepts**
+* **List Memory Representation:** Contrast C’s contiguous, homogeneous arrays with Python's contiguous arrays of object references. Python lists store pointers pointing to heterogeneous heap structures, explaining why lists can hold mixed datatypes at a slight pointer dereferencing cost [PDSH Page 35, B5 Page 284].
+* **The Mutability API:** Trace how elements are appended in $O(1)$ amortized time, inserted in $O(N)$ linear time, and removed via `del`, `.pop()`, or `.remove()` [B5 Page 288, 293–294, B2 Page 84].
+* **Aliasing vs. Cloning:** Understand that `list2 = list1` merely copies the heap pointer address (aliasing), while slicing `list2 = list1[:]` or using `list1.copy()` creates a shallow copy (cloning) [B5 Page 291].
+* **Sorting:** Use `.sort()` to modify the list in-place, or `sorted()` to return a new sorted list, optionally utilizing lambda custom key extractors [B5 Page 296, B1 Page 378].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B5:** Chapter 10 ("Lists and Tuples") — List creation, mutability, aliasing, and methods (pp. 283–300) [B5].
+    * **B1:** Chapter 11 ("Data Collections") — Section 11.2 ("Lists and Arrays") (pp. 366–370) [B1].
+    * **PDSH:** Chapter 4 ("Understanding Data Types") — "A Python List Is More Than Just a List" (pp. 35–37) [PDSH].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Demonstrate the side effects of memory aliasing vs. explicit cloning on a shared list object:
+
+    ```python
+    # Aliasing (Shared reference)
+    original = [1, 2, 3]
+    alias = original
+    alias.append(99)
+    print("Original (After Alias Edit):", original)  # Output: [1, 2, 3, 99]
+
+    # Cloning (Shallow copy)
+    cloned = original[:]
+    cloned.append(1000)
+    print("Original (After Clone Edit):", original)  # Output: [1, 2, 3, 99] (Protected!)
+    print("Cloned List:", cloned)                   # Output: [1, 2, 3, 99, 1000]
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 4: List Comprehensions & Nested Lists
+
+### **Lesson Objective**
+Evaluate list comprehensions, build multi-dimensional Cartesian grids, and process coordinate datasets using nested list matrices [B5 Page 301, B1 Page 368].
+
+### **Core Concepts**
+* **List Comprehension Syntax:** Build lists elegantly using `[expression for item in iterable if condition]`, replacing standard verbose looping sequences with highly optimized, single-line generators [B5 Page 305].
+* **Filtering & Transformation:** Apply conditional statements within comprehensions to filter out odd numbers or scale integer lists on-the-fly [B5 Page 306].
+* **Nested Lists (Matrices):** Access multi-dimensional grids using coordinate indexing patterns (e.g., `matrix[row][col]`) [B5 Page 301, B1 Page 387].
+* **Matrix Operations:** Implement linear algebra routines (such as compiling populated matrices and executing in-place matrix transpositions) using nested loops and comprehensions [B5 Page 302].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B5:** Chapter 10 — Nested Lists (pp. 301–304); List Comprehensions (pp. 305–307) [B5].
+    * **B3:** Chapter 8 ("Data Structures") — Section 8.2.10 ("List Comprehensions") (pp. 344–346) [B3].
+    * **B2:** Chapter 4 ("Lists") — Nested Lists (p. 94) [B2].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Write a nested list comprehension to construct a $3\times3$ matrix, and execute a transposition (swapping rows and columns) in a single statement:
+
+    ```python
+    # Create a 3x3 matrix using list comprehension
+    matrix = [[row * 3 + col for col in range(1, 4)] for row in range(3)]
+    print("Original Matrix:")
+    for r in matrix: print(r)
+    # Output:
+    # [1, 2, 3]
+    # [4, 5, 6]
+    # [7, 8, 9]
+
+    # Transpose matrix: swap rows and columns
+    transposed = [[matrix[row][col] for row in range(3)] for col in range(3)]
+    print("Transposed Matrix:")
+    for r in transposed: print(r)
+    # Output:
+    # [1, 4, 7]
+    # [2, 5, 8]
+    # [3, 6, 9]
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 5: Tuples: Creation, Immutability, and Unpacking
+
+### **Lesson Objective**
+Contrast tuples with lists, understand syntax requirements for singletons, evaluate performance advantages, and utilize sequence unpacking [B5 Page 307, B1 Page 387].
+
+### **Core Concepts**
+* **Tuple Definition & Immutability:** Explain that tuples are immutable sequence structures. Since they cannot change shape or size, the interpreter optimizes their allocation speed and memory footprints [B5 Page 307].
+* **Singleton Syntax Boundary:** Highlight that single-element tuples require a mandatory trailing comma (e.g., `(42,)` vs. parenthesized expression `(42)`), which distinguishes them from parenthesized integers in math expressions [B5 Page 307, B2 Page 96].
+* **Tuple Unpacking:** Unpack multiple sequence elements into distinct variables in a single assignment (e.g., `x, y = coord`), enabling elegant swappings and multiple-value function returns [B1 Page 387, B5 Page 309].
+* **Memory Overhead Advantages:** Since tuples are read-only, CPython executes them in a static, pre-allocated memory chunk, making them faster to process than dynamically resized lists [B5 Page 319].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B5:** Chapter 10 ("Lists and Tuples") — Tuples creation, basic operations, and functions (pp. 307–318) [B5].
+    * **B1:** Chapter 11 ("Data Collections") — Section 11.8 ("Tuple is similar to an immutable list") (pp. 387–388) [B1].
+    * **B2:** Chapter 4 ("Lists") — "The Tuple Data Type" (pp. 96–97) [B2].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Demonstrate singleton assignment boundaries, multiple return values, and simultaneous tuple unpacking:
+
+    ```python
+    # 1. Singleton syntax verification
+    not_a_tuple = (100)
+    is_a_tuple = (100,)
+    print("Type (100):", type(not_a_tuple))   # Output: <class 'int'>
+    print("Type (100,):", type(is_a_tuple))   # Output: <class 'tuple'>
+
+    # 2. Return multiple values and unpack
+    def get_coordinate():
+        return (4, 5)  # Return tuple
+
+    x, y = get_coordinate()  # Tuple unpacking
+    print(f"Unpacked Coordinates: X = {x}, Y = {y}")  # Output: X = 4, Y = 5
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 6: Dictionaries: Hash Tables, Keys, and Comprehensions
+
+### **Lesson Objective**
+Explain Python's dictionary mapping architecture, enforce strict key mutability constraints, apply safe retrieval methods, and construct dictionary comprehensions [B5 Page 321, B1 Page 401].
+
+### **Core Concepts**
+* **Hash Tables & Mappings:** Understand that dictionaries are mappings implementing highly efficient, constant-time $O(1)$ key search retrievals using a hash table structure under the hood [B1 Page 401, B5 Page 321].
+* **Strict Key Constraints:** Keys must be unique and belong strictly to immutable datatypes (such as strings, integers, or tuples), which ensures their generated hash remains stable over their lifetime [B5 Page 323]. Mutable types (like lists) cannot be hashed and will raise a `TypeError` if used as keys [B5 Page 323, B2 Page 105].
+* **Safe API Extraction:** Use `.get(key, default)` to query dictionary items safely. This prevents run-time `KeyError` crashes when keys are missing [B5 Page 330, B2 Page 109].
+* **Dictionary Comprehensions:** Construct populated dictionaries dynamically using `{key_expr: value_expr for item in sequence}` [B5 Page 307, B2 Page 120].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B5:** Chapter 11 ("Dictionaries") — Keys constraints, operations, and methods (pp. 321–336) [B5].
+    * **B1:** Chapter 11 — Section 11.7 ("Non-sequential Collections") — Mappings, Keys, Values (pp. 401–407) [B1].
+    * **B2:** Chapter 5 ("Dictionaries and Structuring Data") — Dict basics, get() method, keys/values (pp. 105–111) [B2].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Write a dictionary comprehension that maps names to their character lengths, and demonstrate how to safely fetch a missing key with `.get()`:
+
+    ```python
+    # List of names
+    names = ["Alice", "Bob", "Charlie"]
+
+    # Dictionary comprehension
+    name_lengths = {name: len(name) for name in names}
+    print("Compiled Dictionary:", name_lengths)
+    # Output: {'Alice': 5, 'Bob': 3, 'Charlie': 7}
+
+    # Querying keys
+    # print(name_lengths["Dave"])  # Raises KeyError!
+
+    # Safe querying using get()
+    print("Dave Length:", name_lengths.get("Dave", 0))  # Output: 0 (Falls back safely to default value)
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 7: Sets & the Standard Collections Module
+
+### **Lesson Objective**
+Apply unique, unordered set data structures, execute core set operations (union, intersection, difference, and symmetric difference), and leverage standard library structures like OrderedDict and Counter [B5 Page 61, 335, B3 Page 360, B1 Page 414].
+
+### **Core Concepts**
+* **Unordered Set Properties:** Sets are unordered collections of unique elements. They are useful for removing duplicates and executing membership checks in constant time $O(1)$ [B5 Page 61, B1 Page 414].
+* **Mathematical Operations:** Implement set operations using built-in operators: union (`|`), intersection (`&`), difference (`-`), and symmetric difference (`^`) [B5 Page 61, B3 Page 360].
+* **collections.OrderedDict:** Traditional dictionaries did not preserve key insertion order. Leverage `OrderedDict` to combine the lookup speed of a dictionary with the sequence order of a list [B5 Page 335, PCC Page 215].
+* **collections.Counter:** A specialized dictionary subclass designed specifically for tallying elements quickly and cleanly [B3 Page 365, PCC Page 215].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B5:** Chapter 10 — Sets (p. 61) [B5]; Chapter 11 — Ordered Dictionaries (p. 335) [B5].
+    * **B3:** Chapter 8 ("Data Structures") — Sets (pp. 359–363) [B3].
+    * **Python Crash Course:** Chapter 9 — "The Python Standard Library" — OrderedDict and Counter (pp. 215–216) [PCC].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Demonstrate unique set operations and tally element frequencies in a raw list using the Counter module:
+
+    ```python
+    from collections import Counter
+
+    # 1. Tallying list elements
+    survey_data = ["Python", "C", "Python", "Java", "C", "Python"]
+    frequencies = Counter(survey_data)
+    print("Counter Frequencies:", frequencies)
+    # Output: Counter({'Python': 3, 'C': 2, 'Java': 1})
+
+    # 2. Set algebra operations
+    set_a = {"Python", "C", "C++"}
+    set_b = {"Java", "Python", "Ruby"}
+
+    print("Union (|):", set_a | set_b)          # Output: {'Python', 'Ruby', 'C++', 'Java', 'C'}
+    print("Intersection (&):", set_a & set_b)   # Output: {'Python'}
+    print("Difference (-):", set_a - set_b)       # Output: {'C++', 'C'}
+    ```
+  </Accordion>
+</Accordions>
+
+---

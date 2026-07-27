@@ -1,0 +1,476 @@
+---
+title: UNIT VI
+---
+
+# Advanced Python and Applications
+
+**Core Curriculum Focus:** High-performance numerical computing (NumPy), structured data analysis (Pandas), statistical visualization (Matplotlib & Seaborn), web scraping and HTML parsing (Requests & BeautifulSoup), filesystem automation (os & shutil), modular mini-project design, and production code quality (PEP 8) [Syllabus].
+
+### **Textbook Priority Order**
+1. **PDSH:** *Python Data Science Handbook* (Jake VanderPlas, 2nd Edition) — Primary for NumPy, Pandas, Matplotlib, and Seaborn [PDSH]
+2. **B5:** *Core Python Programming* (Dr. R. Nageswara Rao, 2nd Edition) — Primary for Array foundations, Networking/Web Scraping, Filesystem scripts, and PEP 8 style guidelines [B5]
+3. **B2:** *Automate the Boring Stuff with Python* (Al Sweigart) — Primary for Requests, BeautifulSoup, and Shutil filesystem operations [B2]
+4. **B1:** *Python Programming: An Introduction to Computer Science* (John M. Zelle) — Primary for Software Design, Simulation, and Program Structure [B1]
+5. **B3:** *Python Programming Using Problem Solving Approach* (Reema Thareja) — Supporting reference for basic Matplotlib plotting [B3]
+
+---
+
+## MODULE 1: High-Performance Numerical Computing with NumPy (Vectorization & Broadcasting)
+
+### **Lesson Objective**
+Students will be able to analyze CPython's loop overhead bottleneck, explain the contiguous C-array memory layout of NumPy ndarrays compared to Python's pointer-based lists, apply vectorized universal functions (Ufuncs) to eliminate loops, and implement broadcasting rules to evaluate multi-dimensional calculations efficiently [PDSH Ch. 6, 8, B5 Ch. 7].
+
+### **Core Concepts**
+* **The Bottleneck of Python Loops:** Traced to CPython's dynamic type-checking overhead and reference-counting redirection. For every loop iteration, CPython must inspect the object's header struct (`ob_type`) to determine its datatype and resolve method dispatches, adding massive processing latency [PDSH Page 51, 52].
+* **Contiguous C-Array Memory Layout:** NumPy ndarrays are homogeneous contiguous blocks of raw bytes pointing directly to fixed-size datatypes (e.g., float64, int32), matching C-style arrays. This avoids the 28-byte overhead of standard Python integers [PDSH Page 35, 36, B5 Page 141].
+* **Universal Functions (Ufuncs):** Vectorized mathematical wrappers implemented in compiled C that perform element-wise operations on arrays, bypassing the PVM loop evaluation cycle completely [PDSH Page 52, 53].
+* **Broadcasting Rules:** Rules for performing operations on arrays of different shapes:
+  * If the arrays differ in their number of dimensions, the shape of the array with fewer dimensions is padded with ones on its leading (left) side [PDSH Page 67].
+  * If the shape of the two arrays does not match in a given dimension, the array with a shape equal to 1 in that dimension is stretched to match the other shape [PDSH Page 67].
+  * If in any dimension the sizes disagree and neither is equal to 1, a broadcasting error is raised [PDSH Page 67].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **PDSH:** Chapter 6 ("Computation on NumPy Arrays: Universal Functions") — The Slowness of Loops, Introducing Ufuncs, Exploring NumPy’s Ufuncs, Array Arithmetic (pp. 51–56); Chapter 8 ("Computation on Arrays: Broadcasting") — Introducing Broadcasting, Rules of Broadcasting, Broadcasting Examples (pp. 65–71) [PDSH].
+    * **B5:** Chapter 7 ("Arrays") — NumPy arrays, multi-dimensional structures, and vectorization (pp. 141–206) [B5].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Write a script that times the element-wise squaring of an array containing 1,000,000 numbers using a standard Python for loop versus a vectorized NumPy Ufunc, displaying the performance multiplier:
+
+    ```python
+    import time
+    import numpy as np
+
+    # 1. Initialize data
+    elements = 1000000
+    python_list = list(range(elements))
+    numpy_array = np.arange(elements)
+
+    # 2. Time CPython loop execution
+    start_time = time.time()
+    python_squared = [x ** 2 for x in python_list]
+    python_duration = time.time() - start_time
+
+    # 3. Time Vectorized NumPy Ufunc execution
+    start_time = time.time()
+    numpy_squared = numpy_array ** 2  # Vectorized operator binding to np.power ufunc
+    numpy_duration = time.time() - start_time
+
+    # 4. Print comparative diagnostics
+    print(f"CPython Loop Duration: {python_duration:.5f} seconds")
+    print(f"NumPy Vectorized Ufunc Duration: {numpy_duration:.5f} seconds")
+    print(f"NumPy Performance Multiplier: {python_duration / numpy_duration:.2f}x faster!")
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 2: Structured Data Manipulation with Pandas (Series & DataFrames)
+
+### **Lesson Objective**
+Students will be able to construct Pandas Series and DataFrames, explain index alignment mechanics, load unstructured flat CSV data into structured memory spaces, and execute relational database operations (boolean indexing, filtering, selecting, and grouped aggregations) on structured data tables [PDSH Part III, B5 Ch. 25].
+
+### **Core Concepts**
+* **The Series Object:** A one-dimensional homogeneous array of indexed data, combining the performance properties of a NumPy array with the explicit label-index lookup capabilities of a Python dictionary [PDSH Page 101, 102].
+* **The DataFrame Object:** A two-dimensional, size-mutable, heterogeneous tabular data structure containing aligned columns of Labeled Series objects sharing a unified index [PDSH Page 104, 105].
+* **Index Alignment:** Alignment of data based on row labels during operations. Missing keys on either side are automatically padded with float64 NaN values [PDSH Page 116].
+* **Boolean Masking & Relational Queries:** Extracting subsets of a DataFrame based on boolean evaluations matching structural criteria, equivalent to SQL WHERE queries [PDSH Page 72, 73, 137].
+* **Split-Apply-Combine:** The grouping operation workflow:
+  * Split the DataFrame into subsets based on key values [PDSH Page 162].
+  * Apply an aggregation function (e.g., mean, sum, count) to each sub-group [PDSH Page 162].
+  * Combine the output vectors into a unified resulting DataFrame [PDSH Page 162].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **PDSH:** Part III ("Data Manipulation with Pandas") — Introducing Pandas Objects (pp. 101–114); Operating on Data in Pandas (pp. 115–124); Data Indexing and Selection (pp. 125–134); Combining Datasets (pp. 135–154); Aggregation and Grouping (pp. 155–170) [PDSH].
+    * **B5:** Chapter 25 ("Data Science Using Python") — Creating DataFrames from Python structures, loading CSV files, operations on DataFrames, and aggregations (pp. 693–705) [B5].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Demonstrate loading raw tabular records into a Pandas DataFrame, filtering records based on condition masks, and calculating grouped aggregations:
+
+    ```python
+    import pandas as pd
+
+    # 1. Create a raw dataset of employee records
+    data = {
+        'Department': ['IT', 'HR', 'IT', 'Sales', 'HR', 'Sales', 'IT'],
+        'Salary': [75000, 52000, 81000, 62000, 55000, 68000, 92000],
+        'Experience_Years': [3, 2, 5, 4, 3, 6, 7]
+    }
+
+    # 2. Load into DataFrame structure
+    df = pd.DataFrame(data)
+    print("--- Raw DataFrame ---")
+    print(df)
+
+    # 3. Boolean selection mask: Filter for employees with > 3 years experience
+    experience_mask = df['Experience_Years'] > 3
+    filtered_df = df[experience_mask]
+    print("\n--- Filtered DataFrame (Experience > 3 Years) ---")
+    print(filtered_df)
+
+    # 4. Split-Apply-Combine: Calculate mean salary grouped by department
+    grouped_salary = df.groupby('Department')['Salary'].mean().reset_index()
+    print("\n--- Grouped Aggregation (Mean Salary by Department) ---")
+    print(grouped_salary)
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 3: Statistical and Scientific Data Visualization (Matplotlib & Seaborn)
+
+### **Lesson Objective**
+Students will be able to construct publication-quality statistical visualizations using Matplotlib's explicit object-oriented programming interface (fig, ax), compare line plots, scatter charts, and frequency histograms, build multi-panel subplots, and utilize Seaborn to visualize complex multivariate relationships with clean aesthetic styling [PDSH Part IV, B5 Ch. 25, B3 Appendix D].
+
+### **Core Concepts**
+* **MATLAB Style vs. Object-Oriented Interface:** Matplotlib supports both a stateful MATLAB-style interface (`plt.plot()`) and an explicit object-oriented interface (`fig, ax = plt.subplots()`). The object-oriented model is preferred for complex, highly customizable layouts because it explicitly exposes the figure canvas and axes frames as manipulable object references [PDSH Page 191, 192].
+* **Subplot Grids:** Constructing multi-panel coordinate plots using `ax` arrays to display different dimensions of a dataset side-by-side [PDSH Page 218].
+* **Data Representation Standards:**
+  * **Line Plots:** Best for displaying continuous trends over a sequential index (e.g., time-series logs) [PDSH Page 193].
+  * **Scatter Plots:** Best for exploring correlations and clusters between two continuous variables [PDSH Page 202].
+  * **Histograms:** Best for displaying the probability distribution of a single continuous variable [PDSH Page 211].
+* **Seaborn Statistical Aesthetics:** Seaborn is built on top of Matplotlib, integrating statistical analysis directly into the visualization layout. It provides high-level APIs to render complex plots like factor counts, violin plots, and linear regression fits with beautiful default styles and color palettes [PDSH Page 340].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **PDSH:** Part IV ("Visualization with Matplotlib") — General Matplotlib Tips (pp. 189–192); Simple Line Plots (pp. 193–201); Simple Scatter Plots (pp. 202–210); Histograms, Binnings, and Density (pp. 211–217); Multiple Subplots (pp. 218–226); Chapter 36 ("Visualization with Seaborn") — Seaborn versus Matplotlib, Exploring Seaborn Plots (pp. 340–350) [PDSH].
+    * **B5:** Chapter 25 ("Data Science Using Python") — Data Visualization, Bar Graphs, Histograms, Line Graphs, and Pie Charts (pp. 706–712) [B5].
+    * **B3:** Appendix D ("Plotting Graphs in Python") — Drawing charts (pp. 530–535) [B3].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Write a script using Matplotlib's object-oriented interface to generate a side-by-side two-panel subplot showing a linear trend line on one side and a distribution histogram on the other:
+
+    ```python
+    import matplotlib
+    matplotlib.use('Agg')  # Set headless backend for server execution
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    # 1. Generate artificial statistical data
+    np.random.seed(42)
+    x_data = np.linspace(0, 10, 100)
+    y_trend = 2.5 * x_data + np.random.normal(0, 2, 100)
+    distribution_data = np.random.normal(50, 15, 1000)
+
+    # 2. Initialize an explicit Object-Oriented Subplot Layout (1 row, 2 columns)
+    fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(12, 5))
+
+    # 3. Populate Left Panel (Axes 0): Scatter plot and regression trend line
+    axes[0].scatter(x_data, y_trend, color='teal', alpha=0.6, label='Sample Points')
+    axes[0].plot(x_data, 2.5 * x_data, color='crimson', linestyle='--', linewidth=2, label='True Relationship')
+    axes[0].set_title("Bivariate Correlation Analysis", fontsize=12)
+    axes[0].set_xlabel("Independent Variable (X)", fontsize=10)
+    axes[0].set_ylabel("Dependent Variable (Y)", fontsize=10)
+    axes[0].legend(loc="upper left")
+    axes[0].grid(True, linestyle=':', alpha=0.6)
+
+    # 4. Populate Right Panel (Axes 1): Frequency Histogram with normal density curve
+    axes[1].hist(distribution_data, bins=30, color='royalblue', edgecolor='white', alpha=0.7, density=True)
+    axes[1].set_title("Probability Distribution Density", fontsize=12)
+    axes[1].set_xlabel("Measured Value", fontsize=10)
+    axes[1].set_ylabel("Probability Density", fontsize=10)
+    axes[1].grid(True, linestyle=':', alpha=0.6)
+
+    # 5. Optimize structural layout margins
+    plt.tight_layout()
+
+    # 6. Save figure canvas directly to volatile storage
+    plt.savefig("classroom_plot.png", dpi=150)
+    plt.close()
+    print("Multi-panel coordinate figure generated successfully at: classroom_plot.png")
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 4: Web Scraping and HTML Harvesting (Requests & BeautifulSoup)
+
+### **Lesson Objective**
+Students will be able to outline the HTTP request-response pipeline, extract raw HTML trees using the `requests` library, handle HTTP exceptions defensively, parse and navigate the tree using CSS selectors inside BeautifulSoup, and write streams to download media files in dynamic data chunks [B5 Ch. 23, B2 Ch. 11].
+
+### **Core Concepts**
+* **HTTP Request-Response Protocol:** Web scraping starts by mimicking a client browser requesting resources from a server. The client sends a Request containing Header metadata (like User-Agent signatures to bypass bot blockers). The server returns a Response containing an HTTP Status Code (e.g., 200 OK, 404 Not Found) and raw body content [B2 Page 237, 238].
+* **Defensive Connection Handling:** Scraping scripts must check for failures. Calling `response.raise_for_status()` immediately throws a runtime exception if the server returned a 4xx or 500-range error, allowing safe terminations [B2 Page 238].
+* **HTML DOM Trees:** Web pages are structured hierarchically as a Document Object Model (DOM). Beautiful Soup compiles raw HTML text strings into nested Python object trees that can be navigated programmatically [B2 Page 245].
+* **CSS Selector Parsing:** Navigating the parsed tree efficiently using the `.select()` API. It matches tags, IDs (`#id`), classes (`.class`), and nested children paths (e.g., `div.content p a`) [B2 Page 246, 247].
+* **Buffered Stream Downloads:** To download binary assets (like images or PDF reports) without overloading system RAM, the stream must be downloaded in small sequential chunks using `response.iter_content()` and written to binary file streams (`'wb'`) [B2 Page 239, 240].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B5:** Chapter 23 ("Networking in Python") — Retrieving IP Addresses (pp. 628); Reading and parsing raw web page sources using urllib (pp. 630–632); Image downloading scripts (p. 633) [B5].
+    * **B2:** Chapter 11 ("Web Scraping") — Opening browsers with webbrowser (pp. 234–236); Retrieving HTML with requests (pp. 237–240); Parsing HTML structure with BeautifulSoup (pp. 245–251); Saving downloaded files (p. 239) [B2].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Write a complete, defensive web scraping template that requests a target page using fake headers, parses its hyperlinks with CSS selectors, and utilizes a buffered stream chunk loop to download a remote binary graphic asset:
+
+    ```python
+    import bs4
+    import requests
+
+    # 1. Target URL and custom user-agent headers to mimic standard browser
+    url = "https://automatetheboringstuff.com/files/rj.txt"  # Sample text file
+    image_url = "https://gutenberg.org/gutenberg_logo.png"
+
+    # 2. Execute defensive HTTP GET Request with timeout constraints
+    try:
+        print(f"Requesting text stream from: {url}")
+        response = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10)
+        response.raise_for_status()  # Check for HTTP Errors
+
+        # Print sample text characters
+        print("Connection Successful! Sample content:")
+        print(response.text[0:150])
+
+    except Exception as err:
+        print(f"HTTP Connection Failed: {err}")
+
+    # 3. Simulate image download using Buffered Stream Chunks (Constant RAM footprint)
+    try:
+        print(f"\nRequesting binary media asset from: {image_url}")
+        img_response = requests.get(image_url, headers={'User-Agent': 'Mozilla/5.0'}, stream=True, timeout=10)
+        img_response.raise_for_status()
+
+        output_path = "downloaded_logo.png"
+        with open(output_path, 'wb') as bin_file:
+            # Loop over stream in chunks of 100 KB
+            for chunk in img_response.iter_content(chunk_size=102400):
+                if chunk:  # Filter out keep-alive chunks
+                    bin_file.write(chunk)
+
+        print(f"Media asset saved successfully at: {output_path}")
+
+    except Exception as err:
+        print(f"Failed to stream and save media: {err}")
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 5: Scripting for Automation and Filesystem Operations (os & shutil)
+
+### **Lesson Objective**
+Students will be able to construct cross-platform file paths, traverse directory hierarchies dynamically using `os.walk()`, and automate file categorization, backup copying, renaming, and Zip compression utilizing the `os` and `shutil` modules [B5 Ch. 17, B2 Ch. 9].
+
+### **Core Concepts**
+* **Path Separator Conflicts:** Systems use different path delimiters (backslash `\` on Windows, forward slash `/` on Unix-like environments). Writing hard-coded string paths like `"C:\docs\file.txt"` breaks portability. Using `os.path.join()` or the object-oriented `pathlib.Path` resolves local OS separators automatically [B2 Page 174, 175].
+* **Relative vs. Absolute Traversal:** Absolute paths map the exact path from root directories, while relative paths map paths relative to the current working directory [B2 Page 175, 176].
+* **Directory Walks:** Walking the directories recursively using `os.walk()`. It crawls a target path, returning a 3-tuple (current directory path, list of child directories, and list of file names) on every loop pass [B5 Page 473, B2 Page 202, 203].
+* **File Operations Management:**
+  * `shutil.copy(src, dst)`: Copies a single file [B2 Page 198].
+  * `shutil.move(src, dst)`: Moves or renames files/directories across paths [B2 Page 199].
+  * `shutil.rmtree(path)`: Recursively and permanently deletes directory trees [B2 Page 200].
+* **Automated Zip Archives:** Packaging folders into compressed `.zip` files using `zipfile.ZipFile`, capturing and adding individual path structures [B2 Page 205, 206].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B5:** Chapter 17 ("Files in Python") — Folder verification, cursor checking, directory paths, and scripting file counts (pp. 441–476) [B5].
+    * **B2:** Chapter 9 ("Organizing Files") — The shutil module, Copying, Moving, Renaming, Deleting, Walking Directory Trees, Compressing with zipfile (pp. 198–206) [B2].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Write a script that creates a temporary directory tree containing unsorted files, walks the tree to categorize files based on their extension, and packages the results into a compressed `.zip` archive:
+
+    ```python
+    import os
+    import shutil
+    import zipfile
+
+    # 1. Setup mock unsorted directory
+    source_dir = "unsorted_files"
+    os.makedirs(source_dir, exist_ok=True)
+
+    # Generate dummy text and data files
+    for i in range(3):
+        with open(os.path.join(source_dir, f"report_{i}.txt"), 'w') as f:
+            f.write(f"System Report {i}")
+        with open(os.path.join(source_dir, f"data_{i}.csv"), 'w') as f:
+            f.write("id,value\n1,100")
+
+    # 2. Automation: Categorize files dynamically by checking extensions
+    print("Categorizing directory...")
+    for folder_name, subfolders, filenames in os.walk(source_dir):
+        for filename in filenames:
+            ext = os.path.splitext(filename)[1].lower()
+            if ext == '.txt':
+                target_subfolder = os.path.join(source_dir, "Text_Reports")
+            elif ext == '.csv':
+                target_subfolder = os.path.join(source_dir, "CSV_Data")
+            else:
+                continue
+
+            os.makedirs(target_subfolder, exist_ok=True)
+            shutil.move(os.path.join(folder_name, filename), os.path.join(target_subfolder, filename))
+            print(f"Moved {filename} to {os.path.basename(target_subfolder)}/")
+
+    # 3. Create a compressed ZIP archive of the organized directories
+    archive_path = "organized_archive.zip"
+    print(f"\nCompressing directory tree into: {os.path.basename(archive_path)}")
+    with zipfile.ZipFile(archive_path, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+        for folder_name, subfolders, filenames in os.walk(source_dir):
+            for filename in filenames:
+                absolute_path = os.path.join(folder_name, filename)
+                # Maintain relative directory hierarchy inside archive
+                relative_path = os.path.relpath(absolute_path, source_dir)
+                zip_file.write(absolute_path, relative_path)
+
+    print("Automation task complete!")
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 6: Mini-Project: Real-World Script Development
+
+### **Lesson Objective**
+Students will design, build, and test a modular, robust, real-world automation utility. They will apply a top-down modular development lifecycle to handle specifications, decouple functional units, and implement error verification boundaries [B1 Ch. 9, B3 Ch. 3].
+
+### **Core Concepts**
+* **Top-Down & Modular Software Design:** Designing software by breaking down a high-level problem specification into simpler, decoupled functional units. This simplifies coding, makes it easier to run unit tests, and prevents complex dependency conflicts [B1 Page 289, 301, 302].
+* **Decoupled Architecture:** Separating calculations and processing from user interface displays and file operations, making the codebase easier to reuse and scale [B1 Page 200, 336, 447].
+* **Defensive File Pipeline Design:** Constructing robust I/O layers that handle system resource failures (like missing files or locked streams) without crashing the runtime [B5 Page 424].
+* **Data Aggregation & Reporting:** Synthesizing arrays of data into statistical summaries (calculating metrics like means and ranges) and printing formatted reports [B1 Page 329, 374].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B1:** Chapter 9 ("Simulation and Design") — Top-Down Design, Structure Charts, Modular Prototyping, and Unit Testing (pp. 283–306) [B1].
+    * **B3:** Chapter 3 / Annexure 4 ("Testing and Debugging") — Finding errors, dry-runs, and tracing execution paths (pp. 130–133) [B3].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    An end-to-end, modular real-world script: A Sensor Weather Station Aggregator. This utility reads CSV transaction logs, cleans anomalous missing elements defensively, aggregates metrics using NumPy, and generates a formatted text-file summary:
+
+    ```python
+    import os
+    import numpy as np
+
+    # 1. Generate sample sensor logging transactions
+    log_file = "weather_sensor_raw.csv"
+    with open(log_file, 'w') as f:
+        f.write("Sensor_ID,Timestamp,Temperature_C,Humidity_Pct\n")
+        f.write("S_01,10:00,24.5,62.0\n")
+        f.write("S_02,10:05,25.1,MISSING\n")  # anomalous corrupt element
+        f.write("S_01,10:10,23.8,61.5\n")
+        f.write("S_03,10:15,26.2,59.8\n")
+        f.write("S_02,10:20,24.9,63.1\n")
+
+    # 2. Decoupled Processor Function (No file I/O operations inside calculation)
+    def calculate_sensor_statistics(temperatures, humidities):
+        """Calculates statistical indicators on cleaned float list inputs."""
+        temp_array = np.array(temperatures, dtype=np.float64)
+        hum_array = np.array(humidities, dtype=np.float64)
+
+        metrics = {
+            'temp_mean': np.mean(temp_array),
+            'temp_max': np.max(temp_array),
+            'temp_min': np.min(temp_array),
+            'hum_mean': np.mean(hum_array),
+            'count': len(temp_array)
+        }
+        return metrics
+
+    # 3. Defensive File Pipeline Function
+    def process_weather_log(filepath):
+        """Loads log data, cleans anomalous records, and coordinates statistics."""
+        if not os.path.exists(filepath):
+            print(f"Error: Target path {filepath} not found on system.")
+            return None
+
+        cleaned_temps = []
+        cleaned_hums = []
+
+        print(f"Extracting logs from: {filepath}")
+        with open(filepath, 'r') as file:
+            header = file.readline()  # Skip header row
+            for line_num, line in enumerate(file, start=2):
+                parts = line.strip().split(',')
+                if len(parts) < 4:
+                    continue  # Skip incomplete lines
+
+                try:
+                    # Catch corrupt data elements defensively
+                    temp = float(parts[2])
+                    hum = float(parts[3])
+                    cleaned_temps.append(temp)
+                    cleaned_hums.append(hum)
+                except ValueError:
+                    # Silently log anomalous omissions and continue
+                    print(f"Anomalous element bypassed on line {line_num}: '{line.strip()}'")
+                    continue
+
+        return calculate_sensor_statistics(cleaned_temps, cleaned_hums)
+
+    # 4. Standalone Execution Guard
+    if __name__ == '__main__':
+        results = process_weather_log(log_file)
+        if results:
+            print("\n=== SYSTEM AGGREGATED WEATHER REPORT ===")
+            print(f"Total Transactions Cleaned: {results['count']}")
+            print(f"Mean Air Temperature:      {results['temp_mean']:.2f}°C")
+            print(f"Temperature Range Limits:   {results['temp_min']:.1f}°C to {results['temp_max']:.1f}°C")
+            print(f"Mean Relative Humidity:     {results['hum_mean']:.2f}%")
+            print("=========================================")
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 7: Production Code Quality and Style Formatting (PEP 8)
+
+### **Lesson Objective**
+Students will be able to memorize and implement Python standard formatting guidelines (PEP 8), apply strict naming hierarchies (snake_case vs. CamelCase), manage line length constraints and imports, construct informative docstrings, and write PEP 8 compliant source code [B5 Ch. 9, B3 Ch. 5, PCC Ch. 8].
+
+### **Core Concepts**
+* **PEP 8 (Style Guide for Python Code):** The official styling document detailing constraints to maximize code readability [B5 Page 206, B3 Page 206].
+* **Indentation & Whitespace Standards:** Use exactly 4 spaces per indentation level instead of tabs [B5 Page 206]. Place single spaces around binary operators (e.g., `=`, `+`, `==`) but avoid trailing space padding [B5 Page 206].
+* **Identifier Naming Hierarchies:**
+  * **Functions & Variables:** Written in lowercase, with words separated by underscores (`snake_case`) [B5 Page 206].
+  * **Classes:** Written using capital letters without separators (`CamelCase` / `CapWords`) [B5 Page 206].
+  * **Constants:** Written in all uppercase, separated by underscores (`UPPER_SNAKE_CASE`) [B5 Page 206].
+* **Blank Lines & Code Structure:** Surround top-level function and class definitions with exactly two blank lines [B5 Page 206]. Methods inside a class are separated by a single blank line.
+* **Explicit Imports:** Avoid wildcard imports (`from module import *`) as they pollute namespaces and cause variable name collisions. Keep imports separate and group them alphabetically [B5 Page 218].
+* **Informative Docstrings:** Every module, class, and function must include a triple-quoted string (`"""docstring"""`) on the first line explaining its input parameters, return values, and behavior [B5 Page 205, 206].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B5:** Chapter 9 ("Functions") / B3: Chapter 5 ("Functions and Modules") — Section 5.9 ("Good Programming Practices") — Indentations, Naming classes/functions, and Comment standards (pp. 206–207) [B5].
+    * **PCC:** Chapter 8 ("Functions") — Styling Functions (pp. 154–155) [PCC].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Present an unstyled, messy script and show how to refactor it live into a compliant, PEP 8 certified function containing complete docstrings and type annotations:
+
+    ```python
+    # --- BEFORE REFACTORING (Non-compliant, poor style) ---
+    def Temp_Convert(celsius_value):
+      f = celsius_value*(9/5)+32 # bad spacing, cryptic variable name
+      return f
+
+    # --- AFTER REFACTORING (Strict PEP 8 Compliant, Production Ready) ---
+    def convert_celsius_to_fahrenheit(celsius: float) -> float:
+        """Converts a temperature measurement from Celsius scale to Fahrenheit.
+
+        Parameters:
+            celsius (float): The temperature value in degrees Celsius.
+
+        Returns:
+            float: The calculated temperature value in degrees Fahrenheit.
+        """
+        conversion_multiplier = 9 / 5
+        offset_constant = 32
+
+        # Calculate Fahrenheit using clean, explicitly spaced mathematical associations
+        fahrenheit = (celsius * conversion_multiplier) + offset_constant
+        return fahrenheit
+
+
+    # Verify compliance
+    print("Celsius (37.0°C) -> Fahrenheit:", convert_celsius_to_fahrenheit(37.0))
+    ```
+  </Accordion>
+</Accordions>
+
+---
