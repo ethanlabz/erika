@@ -4,8 +4,12 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Play, RotateCcw, ArrowRight, Layers, Database } from "lucide-react";
 
-export function ExecutionSimulator() {
-  const [activeTab, setActiveTab] = useState<"memory" | "stack">("memory");
+interface ExecutionSimulatorProps {
+  defaultTab?: "memory" | "stack";
+}
+
+export function ExecutionSimulator({ defaultTab = "memory" }: ExecutionSimulatorProps) {
+  const [activeTab, setActiveTab] = useState<"memory" | "stack">(defaultTab);
   
   // Memory model state
   const [memModel, setMemModel] = useState<"box" | "tag">("tag");

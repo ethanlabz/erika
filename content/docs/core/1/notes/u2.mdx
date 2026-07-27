@@ -591,72 +591,47 @@ This matrix translates common C control structures and functions into their idio
 
 ## SECTION 2.10: HIGH-YIELD EXAM CRITIQUE & TRACE CHALLENGES
 
-<Accordions>
-  <Accordion title="📝 Challenge 1: The Scoping Clash">
-    **Question:** Predict the exact printed console output of the following script. Explain the behavior of the global namespace.
+<Quiz
+  question="Predict the exact printed console output of the following script. Explain the behavior of the global namespace."
+  code={`balance = 1000
 
-    ```python
-    # Trace Challenge 1
-    # Grounded in B5 Page 258-259 and B2 Page 67-70
+def process_transaction(amount):
+    balance = 500 # Local namespace shadowing
+    balance += amount
+    print(f"Local Transaction Balance: {balance}")
 
-    balance = 1000
+process_transaction(200)
+print(f"Global Base Balance: {balance}")`}
+  options={[
+    "Local Transaction Balance: 700 and Global Base Balance: 700",
+    "Local Transaction Balance: 700 and Global Base Balance: 1000",
+    "Local Transaction Balance: 500 and Global Base Balance: 1000",
+    "UnboundLocalError: local variable 'balance' referenced before assignment"
+  ]}
+  correctIndex={1}
+  explanation="The global variable 'balance' is initialized to 1000. When process_transaction(200) is called, the local assignment 'balance = 500' shadows it and creates a separate local variable inside the function. The global variable remains unchanged."
+/>
 
-    def process_transaction(amount):
-        balance = 500 # Local namespace shadowing
-        balance += amount
-        print(f"Local Transaction Balance: {balance}")
+<Quiz
+  question="Explain the output of the following sequence, paying close attention to reference copying and memory aliasing:"
+  code={`def register_user(new_user, roster=[]): # WARNING: Mutable default arguments are evaluated ONCE!
+    roster.append(new_user)
+    return roster
 
-    process_transaction(200)
-    print(f"Global Base Balance: {balance}")
-    ```
+class_a = register_user("Alice")
+class_b = register_user("Bob")
 
-    **Solution Breakdown:**
-    * **Line 1:** The global variable `balance` is initialized to 1000 on the module heap [B5 Page 258].
-    * **Line 4:** When `process_transaction(200)` is called, the statement `balance = 500` is evaluated. Because there is no `global balance` declaration inside the function, Python treats this as a write statement and creates a new local variable named `balance` within the function's namespace [B5 Page 258, B2 Page 69].
-    * **Line 5:** The local variable is updated: $500 + 200 = 700$.
-    * **Line 6:** The print statement outputs: `Local Transaction Balance: 700`.
-    * **Line 9:** The global `balance` variable is printed. Since the global variable was shadowed and remained untouched by the local execution, it still points to the value 1000 [B5 Page 258, B2 Page 69].
-
-    **Console Output:**
-    ```text
-    Local Transaction Balance: 700
-    Global Base Balance: 1000
-    ```
-  </Accordion>
-
-  <Accordion title="📝 Challenge 2: The Mutable Alias Trap">
-    **Question:** Explain the output of the following sequence, paying close attention to reference copying and memory aliasing:
-
-    ```python
-    # Trace Challenge 2
-    # Grounded in B1 Page 197-198 and B5 Page 248
-
-    def register_user(new_user, roster=[]): # WARNING: Mutable default arguments are evaluated ONCE!
-        roster.append(new_user)
-        return roster
-
-    class_a = register_user("Alice")
-    class_b = register_user("Bob")
-
-    print(f"Class A Roster: {class_a}")
-    print(f"Class B Roster: {class_b}")
-    ```
-
-    **Solution Breakdown:**
-    * **The Mutable Default Trap:** In Python, default parameter objects (like `roster=[]`) are evaluated exactly once when the function is first defined, not on each call [B2 Page 65].
-    * **Alias Sharing:** Consequently, `class_a` and `class_b` are both bound to the same physical list object cached on the heap.
-    * **Sequential Mutations:**
-      * Calling `register_user("Alice")` appends `"Alice"` to the shared default list.
-      * Calling `register_user("Bob")` appends `"Bob"` to the same list.
-    * **Output Resolution:** Both variables print the exact same populated list because they point to the same memory reference.
-
-    **Console Output:**
-    ```text
-    Class A Roster: ['Alice', 'Bob']
-    Class B Roster: ['Alice', 'Bob']
-    ```
-  </Accordion>
-</Accordions>
+print(f"Class A Roster: {class_a}")
+print(f"Class B Roster: {class_b}")`}
+  options={[
+    "Class A Roster: ['Alice'] and Class B Roster: ['Bob']",
+    "Class A Roster: ['Alice', 'Bob'] and Class B Roster: ['Alice', 'Bob']",
+    "Class A Roster: ['Alice'] and Class B Roster: ['Alice', 'Bob']",
+    "TypeError: register_user() missing 1 required positional argument"
+  ]}
+  correctIndex={1}
+  explanation="In Python, default arguments (like roster=[]) are evaluated exactly once when the function is defined, not on each call. Both calls share the same list object on the heap, so appending to one modifies it for both."
+/>
 
 ---
 

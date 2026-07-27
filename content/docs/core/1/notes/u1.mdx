@@ -160,7 +160,7 @@ x = x + 1         [ heap address: 0x99A ] --->  Integer Object (1000)   <--- Tag
                   [ heap address: 0x88C ] --->  Integer Object (1001)   <--- Tag "x" moves to this new object
 ```
 
-<ExecutionSimulator />
+<ExecutionSimulator defaultTab="memory" />
 
 ### **3.2 The CPython Integer Object Memory Footprint**
 A standard C integer takes 4 bytes of memory. However, in CPython, a simple integer takes 28 bytes of heap space [PDSH Page 35-37]. This overhead is due to the underlying C structure (`struct _longobject`) used to represent every Python object:
@@ -340,6 +340,8 @@ Python is a hybrid compiled-interpreted language. The execution lifecycle of a s
 [ Machine Code Instructions / Hardware Output ]
 ```
 
+<ExecutionSimulator defaultTab="stack" />
+
 * **CPython Compiler Stage:** When a script is executed, CPython parses the source code (`.py`) [B5 Page 544]. It checks syntax rules and compiles the logic into platform-independent intermediate instructions called bytecode [B5 Page 544].
 * **Bytecode Caching:** The compiled bytecode is cached as `.pyc` files inside a directory named `__pycache__` to speed up future imports [B1 Page 195].
 * **PVM Interpreter Execution:** The platform-dependent Python Virtual Machine (PVM) loads the bytecode [B5 Page 544]. It interprets the instructions line-by-line using a virtual stack evaluation mechanism, converting bytecode dynamically into system assembly calls [B5 Page 544].
@@ -410,6 +412,19 @@ Software issues are classified into three core types [B5 Page 450, B3 Page 41]:
 * **The Floor Division Rounding Trap:** Negative numbers round down away from zero during floor division [B1 Page 25, B5 Page 633]. E.g., `-5 // 2` is `-3`, not `-2`.
 * **String Reversal:** Slicing step strides can reverse strings efficiently without using raw loops. Use `sequence[::-1]` [B1 Page 189, B5 Page 623].
 * **CPython Sizing Overhead:** Do not claim variables in Python take 4 bytes like in C. Every heap object carries overhead headers for its reference count (`ob_refcnt`) and type indicator pointer (`ob_type`) [PDSH Page 36].
+
+<Quiz
+  question="Determine the result of the following Python expression due to floor division rounding and short-circuit rules:"
+  code={`result = (-5 // 2) or "Default Value"`}
+  options={[
+    "-2",
+    "-3",
+    "Default Value",
+    "True"
+  ]}
+  correctIndex={1}
+  explanation="Floor division (-5 // 2) rounds down to the nearest integer towards negative infinity, yielding -3. Since -3 is a non-zero integer, it is truthy, and the 'or' operator short-circuits, immediately returning -3."
+/>
 
 ---
 
