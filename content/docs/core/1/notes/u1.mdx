@@ -160,6 +160,8 @@ x = x + 1         [ heap address: 0x99A ] --->  Integer Object (1000)   <--- Tag
                   [ heap address: 0x88C ] --->  Integer Object (1001)   <--- Tag "x" moves to this new object
 ```
 
+<ExecutionSimulator />
+
 ### **3.2 The CPython Integer Object Memory Footprint**
 A standard C integer takes 4 bytes of memory. However, in CPython, a simple integer takes 28 bytes of heap space [PDSH Page 35-37]. This overhead is due to the underlying C structure (`struct _longobject`) used to represent every Python object:
 
