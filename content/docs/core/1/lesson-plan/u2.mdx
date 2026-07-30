@@ -1,0 +1,386 @@
+---
+title: UNIT II
+---
+
+# Control Structures and Functions
+
+**Core Curriculum Focus:** Selection structures, conditional branching, definite and indefinite iteration, loop jump operations, the loop else suite, modular function design, parameter passing mechanics (Pass-by-Object-Reference), scope resolution (LEGB rule), dynamic argument packing (*args/**kwargs), lambda expressions, and recursive algorithmic design [Syllabus].
+
+### **Textbook Priority Order**
+1. **B1:** *Python Programming: An Introduction to Computer Science* (John M. Zelle, 3rd Edition) [B1]
+2. **B5:** *Core Python Programming* (Dr. R. Nageswara Rao, 2nd Edition) [B5]
+3. **B3:** *Python Programming Using Problem Solving Approach* (Reema Thareja) [B3]
+
+---
+
+## MODULE 1: Selection & Conditional Branching (if, else, elif)
+
+### **Lesson Objective**
+Construct multi-way decision trees in Python using proper block indentation, evaluate compound conditional expressions utilizing logical operator precedence and short-circuit mechanics, and distinguish between value equality (==) and reference identity (is) comparisons [B1 Ch. 7, B5 Ch. 6].
+
+### **Core Concepts**
+* **Block Indentation (Suites):** Explain how Python uses whitespace indentation (standard 4 spaces) instead of C's curly braces (`{}`) to define blocks of code (called "suites") [B5 Page 119]. A header statement (like `if`, `while`, or `def`) must terminate with a colon (`:`) [B5 Page 119].
+* **Conditional Branching:** Trace the evaluation sequence of simple `if` [B1 Page 217, B5 Page 121], two-way `if-else` [B1 Page 218, B5 Page 121], and multi-way `if-elif-else` chains [B1 Page 222, B5 Page 122]. Emphasize that once a condition in an `if-elif` chain evaluates to True, remaining conditions are bypassed completely.
+* **Logical Precedence & Short-Circuiting:** Explain logical operators (`and`, `or`, `not`) [B1 Page 256, B5 Page 81]. Python evaluates logical expressions left-to-right and employs short-circuit evaluation:
+  * `A or B`: If `A` is truthy, `B` is never evaluated; the expression immediately returns the value of `A` [B1 Page 267].
+  * `A and B`: If `A` is falsy, `B` is never evaluated; the expression immediately returns the value of `A` [B1 Page 267].
+* **Equality vs. Identity:** Value comparison (`==`) evaluates whether two objects contain the same data [B5 Page 85]. Identity comparison (`is`) checks whether both variables point to the exact same physical memory address on the heap [B5 Page 85].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B1 (Zelle):** Chapter 7 ("Decision Structures") — Section 7.1 ("Simple Decisions") (pp. 210–213); Section 7.2 ("Two-Way Decisions") (pp. 214–219); Section 7.3 ("Multi-Way Decisions") (pp. 219–223); Section 8.4 ("Computing with Booleans") — Short-circuit evaluation (pp. 266–269) [B1].
+    * **B5 (Rao):** Chapter 4 ("Operators in Python") — Relational & Logical Operators (pp. 79–82); Identity Operators (p. 85); Chapter 6 ("Control Statements") — if, if-else, and if-elif-else (pp. 117–123) [B5].
+    * **B3 (Thareja):** Chapter 4 ("Decision Control Statements") — pp. 137–146 [B3].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Run this script interactively to demonstrate value equality vs. heap identity, and short-circuit evaluations:
+
+    ```python
+    # 1. Identity vs. Equality Demonstration
+    list_a = [1, 2, 3]
+    list_b = [1, 2, 3]
+    list_c = list_a  # Aliasing both tags to the same object
+
+    print("list_a == list_b:", list_a == list_b)  # True  (Value equality)
+    print("list_a is list_b:", list_a is list_b)  # False (Distinct heap allocations)
+    print("list_a is list_c:", list_a is list_c)  # True  (Points to the same object)
+
+    # 2. Short-Circuit Evaluation Return Value Mechanics
+    # In Python, logical operators return the actual evaluated operand, not just True/False
+    default_username = "Guest"
+    provided_username = ""
+
+    active_user = provided_username or default_username
+    print("Active User:", active_user)  # Output: 'Guest' (provided_username is empty/falsy)
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 2: Iterative Control Structures: Indefinite Loops (while Loops)
+
+### **Lesson Objective**
+Implement indefinite iteration using while loops, design sentinel-controlled and interactive input loops, incorporate priming reads to prevent processing the sentinel value, and establish termination boundaries to avoid infinite loop states [B1 Ch. 8, B5 Ch. 6].
+
+### **Core Concepts**
+* **Indefinite Iteration:** Contrast definite loops (where the number of passes is known in advance) with indefinite loops (which run as long as an expression condition remains True) [B1 Page 245, B5 Page 124].
+* **Execution Lifecycle:** The condition expression is evaluated before entering the loop body (a pre-test loop) [B1 Page 245, B5 Page 124]. If it evaluates to False on the first check, the loop body is bypassed entirely [B1 Page 245, B5 Page 124].
+* **The Priming Read Pattern:** When building a sentinel loop (a loop designed to process a continuous stream of user inputs until a special "sentinel" value like -1 or "quit" is encountered), a programmer must utilize a priming read before the loop header [B1 Page 250]:
+  * Read first value (Priming Read)
+  * While value is not Sentinel:
+    * Process value
+    * Read next value (Loop Update Read)
+  * This sequence ensures that the sentinel value itself is never erroneously sent through the processing suite [B1 Page 250].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B1 (Zelle):** Chapter 8 ("Loop Structures and Booleans") — Section 8.2 ("Indefinite Loops") (pp. 245–247); Section 8.3 ("Common Loop Patterns") — Interactive loops and Sentinel loops (pp. 247–254) [B1].
+    * **B5 (Rao):** Chapter 6 ("Control Statements") — The while Loop (pp. 124–126) [B5].
+    * **B3 (Thareja):** Chapter 4 — Section 4.3 ("Basic Loop Structures") — while loops (pp. 147–154) [B3].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Demonstrate a sentinel-controlled loop that processes numbers until the sentinel value -1 is entered. Show how the priming read prevents the -1 from corrupting the average calculation:
+
+    ```python
+    # Sentinel loop calculating average scores
+    def calculate_average():
+        total = 0.0
+        count = 0
+
+        # 1. Priming Read
+        score_input = input("Enter score (-1 to calculate average): ")
+
+        # 2. Sentinel Check
+        while score_input != "-1":
+            try:
+                score = float(score_input)
+                total += score
+                count += 1
+            except ValueError:
+                print("Invalid input. Skipped.")
+
+            # 3. Loop Update Read
+            score_input = input("Enter next score (-1 to calculate average): ")
+
+        if count > 0:
+            average = total / count
+            print(f"Processed {count} scores. Average is: {average:.2f}")
+        else:
+            print("No scores were entered.")
+
+    calculate_average()
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 3: Iterative Control Structures: Definite Loops (for Loops & range())
+
+### **Lesson Objective**
+Traverse elements of ordered sequence collections using for loops, utilize the range() generator function to execute counted iterations, and analyze multi-dimensional matrix structures using nested loops [B1 Ch. 8, B5 Ch. 6].
+
+### **Core Concepts**
+* **Definite Sequence Iteration:** A for loop in Python behaves as an iterator, sequentially extracting elements from an ordered sequence container (such as strings, lists, or tuples) and executing its block once per item [B1 Page 243, B5 Page 127].
+* **The range() Function:** Explain range(start, stop, step). Emphasize that:
+  * The sequence generated is exclusive of the stop index (it iterates up to, but not including, stop) [B5 Page 128].
+  * In Python 3, range() does not return a statically populated list of integers in memory; it is an immutable sequence generator that yields numbers lazily on demand, executing with a constant $O(1)$ memory footprint [B5 Page 128, B1 Page 45].
+* **Nested Loops:** Explain nested structures where an outer loop controls row transitions and an inner loop executes complete column passes, analyzing the scaling computational complexity ($O(R \times C)$) [B5 Page 133].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B1 (Zelle):** Chapter 2 ("Writing Simple Programs") — Section 2.6 ("Definite Loops") (pp. 43–46); Chapter 8 — Section 8.1 ("For Loops: A Quick Review") (pp. 243–244) [B1].
+    * **B5 (Rao):** Chapter 6 ("Control Statements") — The for Loop (pp. 127–130); Nested Loops (pp. 133–135) [B5].
+    * **B3 (Thareja):** Chapter 4 — Section 4.3.2 ("for Loop") (pp. 155–163); Section 4.4 ("Nested Loops") (pp. 164–167) [B3].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Trace a coordinate grid generator to demonstrate nested loop control and how range() arguments behave:
+
+    ```python
+    # Nested coordinate grid generator (3 rows, 4 columns)
+    rows = 3
+    cols = 4
+
+    print("Starting Grid Generation:")
+    for r in range(1, rows + 1):  # Generates row indices 1, 2, 3
+        print(f"--- Processing Row {r} ---")
+        for c in range(1, cols + 1):  # Generates col indices 1, 2, 3, 4
+            # Print coordinates on the same line using the end parameter
+            print(f"({r},{c})", end=" ")
+        print()  # Empty print forces a newline after inner loop completes
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 4: Control Flow Jumps & Advanced Loops (break, continue, pass, else)
+
+### **Lesson Objective**
+Alter loop execution paths dynamically using break and continue jump statements, deploy the pass statement as a syntactic placeholder, and utilize the unique Python loop else suite to eliminate redundant boolean flags [B5 Ch. 6, B3 Ch. 4].
+
+### **Core Concepts**
+* **The break Statement:** Immediately terminates the execution of the nearest enclosing loop, jumping to the first statement following the loop block [B5 Page 138, B1 Page 263].
+* **The continue Statement:** Aborts the remainder of the current loop iteration, transferring control immediately back to the loop header for the next validation check [B5 Page 138].
+* **The pass Statement:** Acts as a syntactic null statement. Since Python's compiler requires block bodies to contain at least one instruction, pass is utilized to write empty skeleton classes, functions, or exception catch blocks without raising a compilation error [B5 Page 139].
+* **The Loop else Suite:** A unique Python control flow structure. An else block associated with a for or while loop executes only if the loop completes its iterations naturally [B5 Page 172, B3 Page 172]. If the loop is terminated prematurely by a break statement, the else block is completely bypassed [B5 Page 172]. This allows developers to write clean search patterns without introducing temporary "found" boolean flags [B3 Page 172].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B5 (Rao):** Chapter 6 ("Control Statements") — break statement (pp. 137–138); continue statement (p. 138); pass statement (pp. 139–140); Loop-associated else suite (p. 172) [B5].
+    * **B3 (Thareja):** Chapter 4 — Section 4.5 ("The break Statement") (pp. 167–168); Section 4.6 ("The continue Statement") (pp. 168–170); Section 4.7 ("The pass Statement") (p. 171); Section 4.8 ("The else Statement used with Loops") (pp. 172–174) [B3].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Write an elegant prime number locator using the loop else suite. Contrast how clean this code is compared to C-style boolean flag checks:
+
+    ```python
+    # Search for prime numbers in a range using loop-else
+    def check_primes_in_range(start, end):
+        print(f"Finding primes between {start} and {end}:")
+        for num in range(start, end + 1):
+            if num < 2:
+                continue
+
+            # Check for factors
+            for divisor in range(2, int(num ** 0.5) + 1):
+                if num % divisor == 0:
+                    break  # Divisible! Terminate inner loop, bypass else suite
+            else:
+                # Normal loop termination: no factors found. num is prime!
+                print(f"Found prime: {num}")
+
+    check_primes_in_range(10, 30)
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 5: Functions, Parameters, and Scope (LEGB Rule)
+
+### **Lesson Objective**
+Define and invoke functions utilizing explicit parameter lists and return vectors, trace the execution of Python’s Pass-by-Object-Reference memory model across mutable and immutable datatypes, and apply the LEGB rule to resolve variable scope boundaries [B1 Ch. 6, B5 Ch. 9].
+
+### **Core Concepts**
+* **Procedural vs. Functional Decomposition:** Explain why programmers divide complex code blocks into modular, cooperative functions to eliminate code duplication and isolate logic [B1 Page 177, B5 Page 237].
+* **Parameter Passing — Pass-by-Object-Reference:** Contrast Python with C (pass-by-value/pass-by-pointer) [B5 Page 248]. In Python, variable names are tags bound to heap objects [B5 Page 49]. When calling a function, a copy of the reference is passed to the formal parameter:
+  * **Immutable arguments (int, float, str, tuple):** Since the underlying object cannot be altered in-place, reassigning the parameter inside the function merely binds the local name tag to a new object. The original caller variable is unaffected [B5 Page 250, B1 Page 195].
+  * **Mutable arguments (list, dict, set):** Modifying the parameter's internal state in-place (e.g., `list.append()`) directly modifies the shared object. These changes are visible to the caller [B5 Page 251, B1 Page 193].
+  * **Safety Trap:** Creating an entirely new object inside the function (e.g., `lst = [10, 11, 12]`) rebinds the local name tag to a new location. It does not overwrite the caller's list [B5 Page 252].
+* **Scope Resolution (The LEGB Rule):** Namespaces are resolved from inside out across four distinct hierarchical boundaries [B5 Page 258]:
+  * **Local:** Defined inside the current active function block.
+  * **Enclosing:** Defined inside a nested outer function envelope.
+  * **Global:** Defined at the module's top-level script layer.
+  * **Built-in:** Python's system-predefined keywords and built-in routines.
+* **The global Keyword:** Explicitly overrides local shadowing, instructing the interpreter to compile reassignments directly against the global module-level variable namespace [B5 Page 258].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B1 (Zelle):** Chapter 6 ("Defining Functions") — Section 6.1 ("The Function of Functions") (pp. 175–177); Section 6.3 ("Function Calls and Parameter Passing") (pp. 184–187); Section 6.4 ("Functions that Return Values") (pp. 187–192); Section 6.5 ("Functions that Modify Parameters") (pp. 193–198) [B1].
+    * **B5 (Rao):** Chapter 9 ("Functions") — Function Definition & Calling (pp. 238–244); Pass by Object-Reference Mechanics (pp. 248–252); Local and Global Scope & global keyword (pp. 258–260) [B5].
+    * **B3 (Thareja):** Chapter 5 ("Functions and Modules") — pp. 185–197 [B3].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Trace memory references live to illustrate how mutability governs Pass-by-Object-Reference boundaries:
+
+    ```python
+    # Pass-by-Object-Reference demonstration
+    def modify_elements(number_param, list_param):
+        print(f"  --> Inside function entry:")
+        print(f"      number_param ID: {id(number_param)}, value: {number_param}")
+        print(f"      list_param ID: {id(list_param)}, value: {list_param}")
+
+        # 1. Integer is immutable. This rebinds the local tag to a new object.
+        number_param += 100
+
+        # 2. List is mutable. In-place modification alters the shared heap object.
+        list_param.append(99)
+
+        print(f"  --> Inside function exit:")
+        print(f"      number_param ID: {id(number_param)}, value: {number_param} (ID Changed!)")
+        print(f"      list_param ID: {id(list_param)}, value: {list_param} (ID Preserved)")
+
+    # Caller Workspace
+    num = 10
+    my_list = [1, 2, 3]
+
+    print(f"Before Calling Function:")
+    print(f"  num ID: {id(num)}, value: {num}")
+    print(f"  my_list ID: {id(my_list)}, value: {my_list}")
+
+    modify_elements(num, my_list)
+
+    print(f"After Function Execution (Caller Scope):")
+    print(f"  num: {num} (Unchanged!)")
+    print(f"  my_list: {my_list} (Altered in-place!)")
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 6: Dynamic Parameter Architectures & Lambda Expressions
+
+### **Lesson Objective**
+Construct functions that accept positional, keyword, default, and variable-length arguments (*args/**kwargs), and build lightweight, anonymous lambda expressions integrated within functional mappings (map/filter) [B5 Ch. 9].
+
+### **Core Concepts**
+* **Argument Classification:**
+  * **Positional Arguments:** Arguments passed to a function must match the exact sequence order of the formal parameters in the definition [B5 Page 253].
+  * **Keyword Arguments:** Arguments specified explicitly by name during invocation, enabling parameter values to be passed in any sequence [B5 Page 254].
+  * **Default Arguments:** Assigns default fallback values to formal parameters if left unspecified during call invocation. Non-default arguments cannot follow default arguments in definitions [B5 Page 255].
+* **Variable-Length Argument Architectures:**
+  * `*args` (Positional Packing): Instructs the interpreter to pack any additional positional arguments passed during the call into a single, iterable tuple parameter named `args` [B5 Page 256].
+  * `**kwargs` (Keyword Packing): Instructs the interpreter to pack any additional keyword arguments passed during the call into a single, searchable dictionary parameter named `kwargs` [B5 Page 257].
+* **Anonymous Lambda Expressions:**
+  * Syntactically represented as: `lambda arguments: single_expression` [B5 Page 265].
+  * Lambdas do not use a `return` keyword (the evaluated expression is returned implicitly) and are restricted to a single logical line [B5 Page 265]. They are best utilized as inline operations inside functional sequence processors like `map()` and `filter()` [B5 Page 266–267].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B5 (Rao):** Chapter 9 ("Functions") — Argument Types: Positional, Keyword, Default, and Variable Length (pp. 253–257); Lambdas (pp. 265–266); filter(), map(), and reduce() (pp. 266–271) [B5].
+    * **B3 (Thareja):** Chapter 5 — Section 5.8 ("Types of Arguments") (pp. 198–204); Section 5.9 ("Lambda Functions") (pp. 204–205) [B3].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Construct a dynamic transaction invoice generator utilizing `*args` and `**kwargs`, coupled with an inline lambda function mapping:
+
+    ```python
+    # Dynamic Invoice Generator
+    def generate_invoice(customer, *items, tax_rate=0.08, **meta_info):
+        print(f"INVOICE FOR: {customer}")
+        print(f"Transaction Metadata:")
+        for key, val in meta_info.items():
+            print(f"  - {key}: {val}")
+
+        # items tuple holds all positional items packed
+        subtotal = sum(items)
+        total = subtotal * (1 + tax_rate)
+        print(f"Subtotal: ${subtotal:.2f}")
+        print(f"Total (with {tax_rate*100}% Tax): ${total:.2f}\n")
+
+    # Call with arbitrary positional items and keyword meta information
+    generate_invoice("Alice Roy", 45.0, 120.0, 15.50, tax_rate=0.10, Location="Store #101", Cashier="Bob")
+
+    # Demonstrating Lambdas with Map/Filter
+    prices = [10.0, 50.0, 250.0, 100.0]
+    # Use filter to extract prices > 40, and map to apply a 15% discount
+    filtered_prices = list(filter(lambda p: p > 40.0, prices))
+    discounted_prices = list(map(lambda p: p * 0.85, filtered_prices))
+
+    print("Original Prices:", prices)
+    print("Filtered Prices (> 40):", filtered_prices)
+    print("15% Discounted Prices:", discounted_prices)
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 7: Recursive Problem Solving & Stack Frame Analysis
+
+### **Lesson Objective**
+Explain the mathematical principles of recursive decomposition, identify the essential base case and recursive step requirements to prevent infinite recursion runtime stack crashes, and map the stack push/pop lifecycle of a recursive function call [B1 Ch. 13, B5 Ch. 9].
+
+### **Core Concepts**
+* **The Divide-and-Conquer Methodology:** Recursion is a programming technique where a function solves a complex problem by calling itself to solve smaller, identical instances of the same problem [B1 Page 465, B5 Page 262].
+* **The Two Laws of Recursion:**
+  * **The Base Case:** A terminal boundary condition that can be evaluated and resolved directly without requiring further self-calls [B1 Page 467, B5 Page 262].
+  * **The Recursive Step (Reduction):** The self-referential call must operate on a progressively smaller version of the problem, ensuring that the execution chain always converges toward a base case [B1 Page 467, B5 Page 262].
+* **Recursive Stack Frame Lifecycles:**
+  * Each recursive call suspends the current parent execution scope and pushes a new activation record (stack frame) onto the system call stack [B1 Page 468, B5 Page 216].
+  * The system stack stores the local variable namespaces and current return addresses.
+  * If the execution loop fails to reach a base case, it consumes all available system memory slots, resulting in a `RecursionError` (Maximum Recursion Depth Exceeded / Stack Overflow) [B5 Page 216].
+* **The Towers of Hanoi:** A classic recursive divide-and-conquer problem where moving $n$ disks from Post A to Post C using spare Post B requires recursively moving a sub-tower of size $n-1$ [B5 Page 264, B3 Page 239].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B1 (Zelle):** Chapter 13 ("Algorithm Design and Recursion") — Section 13.2 ("Recursive Problem Solving") (pp. 465–471) [B1].
+    * **B5 (Rao):** Chapter 9 ("Functions") — Recursive Functions (pp. 262–264) [B5].
+    * **B3 (Thareja):** Chapter 5 — Section 5.10 ("Recursive Functions") (pp. 206–216); Case Study: Tower of Hanoi (pp. 239–241) [B3].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Implement a recursive factorial script that prints diagnostic traces on the way down the push stack, and on the way up the pop stack, and a solver for the Towers of Hanoi disk movements:
+
+    ```python
+    # 1. Recursive Factorial with Call Stack Trace Logging
+    def trace_factorial(n, depth=0):
+        indent = "  " * depth
+        print(f"{indent}--> PUSH: Entering trace_factorial(n={n})")
+
+        if n == 0 or n == 1:
+            print(f"{indent}<-- POP: BASE CASE reached. Returning 1")
+            return 1
+        else:
+            sub_problem = trace_factorial(n - 1, depth + 1)
+            result = n * sub_problem
+            print(f"{indent}<-- POP: Multiplying {n} * {sub_problem}. Returning {result}")
+            return result
+
+    print("Tracing Call Stack for 4!:")
+    trace_factorial(4)
+    print()
+
+    # 2. Towers of Hanoi Recursive Solver
+    # Moves n disks from source pole to destination pole using intermediate pole
+    def solve_hanoi(n, source, destination, intermediate):
+        if n == 1:
+            print(f"Move disk 1 from pole {source} to pole {destination}")
+            return
+
+        # Step A: Move n-1 disks from source to intermediate using destination
+        solve_hanoi(n - 1, source, intermediate, destination)
+
+        # Step B: Move the remaining largest disk from source to destination
+        print(f"Move disk {n} from pole {source} to pole {destination}")
+
+        # Step C: Move n-1 disks from intermediate to destination using source
+        solve_hanoi(n - 1, intermediate, destination, source)
+
+    print("Solving Towers of Hanoi for 3 disks:")
+    solve_hanoi(3, "A", "C", "B")
+    ```
+  </Accordion>
+</Accordions>
+
+---

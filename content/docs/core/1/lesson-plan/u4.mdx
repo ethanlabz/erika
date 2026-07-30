@@ -1,0 +1,523 @@
+---
+title: UNIT IV
+---
+
+# File Handling and Modules
+
+**Core Curriculum Focus:** File system operations, absolute/relative paths, text/binary stream lifecycles, structured data storage (CSV and JSON), context managers, exception-safe file I/O, built-in standard library modules (math, os, sys, datetime), custom module namespace engineering, and the `__name__` variable execution shield [Syllabus].
+
+### **Textbook Priority Order**
+1. **B1:** *Python Programming: An Introduction to Computer Science* (John M. Zelle, 3rd Edition) [B1]
+2. **B5:** *Core Python Programming* (Dr. R. Nageswara Rao, 2nd Edition) [B5]
+3. **B2:** *Automate the Boring Stuff with Python* (Al Sweigart, 2nd Edition) [B2]
+4. **PCC:** *Python Crash Course* (Eric Matthes, 2nd Edition) [PCC]
+
+---
+
+## MODULE 1: Filesystem Basics, Path Engineering, and Directory Operations
+
+### **Lesson Objective**
+Students will be able to construct cross-platform path references, navigate directory structures programmatically, and perform robust folder manipulation, verification, and directory-tree walks using the `os` and `shutil` modules [B5 Ch. 17, B2 Ch. 8, 9].
+
+### **Core Concepts**
+* **Path Representation Differences:** Windows backslashes (`\\` which must be escaped) vs. POSIX forward slashes (`/`). Using `os.path.join()` to dynamically build platform-independent path strings [B2 Page 173–174].
+* **Execution Context:** The Current Working Directory (CWD). Retrieving the CWD with `os.getcwd()` and changing the execution directory with `os.chdir()` [B2 Page 175].
+* **Absolute vs. Relative Paths:** Distinguish absolute root paths from relative paths mapped from the CWD. Understand special directory tokens: dot (`.`) for the current folder and double-dot (`..`) for the parent folder [B2 Page 175–176].
+* **Directory Verification & Metadata:**
+  * `os.makedirs(path, exist_ok=True)`: Recursive directory creation, building all nested intermediate subdirectories [B2 Page 176].
+  * Checking validity: `os.path.exists()`, `os.path.isfile()`, and `os.path.isdir()` [B2 Page 180].
+  * Gathering metrics: `os.path.getsize()` to retrieve file size in bytes, and `os.listdir()` to return flat arrays of directory filenames [B2 Page 179].
+* **Directory Traversal:** Leveraging `os.walk(path)` to perform recursive top-down or bottom-up directory traversals. Understand that on each iteration, it yields a 3-tuple containing: the current directory path string, a list of subdirectories, and a list of filenames [B5 Page 473, B2 Page 202].
+* **Shell Utilities (shutil):** High-level operations for copying files (`shutil.copy()`), copying entire directory trees (`shutil.copytree()`), moving/renaming directory elements (`shutil.move()`), and deleting non-empty directories recursively (`shutil.rmtree()`) [B2 Page 198, 200].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B5:** Chapter 17 ("Files in Python") — Section "Working with Directories" (pp. 469–474) [B5].
+    * **B2:** Chapter 8 ("Reading and Writing Files") — Files and File Paths (pp. 173–180); Chapter 9 ("Organizing Files") — The shutil Module (pp. 197–202); Walking a Directory Tree (pp. 202–203) [B2].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Write an automated directory-tree crawler script that traverses a source directory, counts files of specific extensions (e.g., `.py`), and prints out their file sizes:
+
+    ```python
+    import os
+
+    def inspect_project_directory(target_path):
+        total_py_files = 0
+        total_bytes = 0
+
+        print(f"Traversing Directory: {os.path.abspath(target_path)}\n")
+        # os.walk yields current_folder, list of subfolders, and list of files
+        for current_folder, subfolders, filenames in os.walk(target_path):
+            print(f"Current Directory: {current_folder}")
+            for filename in filenames:
+                if filename.endswith('.py'):
+                    full_path = os.path.join(current_folder, filename)
+                    file_size = os.path.getsize(full_path)
+                    total_py_files += 1
+                    total_bytes += file_size
+                    print(f"  -> Found Python File: {filename} ({file_size} bytes)")
+
+        print(f"\nExecution Summary:")
+        print(f"Total Python modules found: {total_py_files}")
+        print(f"Total memory footprint of source files: {total_bytes} bytes")
+
+    # Run on current working directory
+    inspect_project_directory('.')
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 2: Plaintext File Operations, Stream Lifecycles, and Stream Read/Write Mechanics
+
+### **Lesson Objective**
+Students will master the complete lifecycle of a file stream (Open $\rightarrow$ Process $\rightarrow$ Close), distinguish between the 12 explicit text and binary access modes, and evaluate the memory implications of various stream-reading strategies [B1 Sec 5.9, B5 Ch. 17, B2 Ch. 8].
+
+### **Core Concepts**
+* **Association Boundary:** The `open(file, mode)` constructor associates a physical file stored in secondary storage with a virtual file stream object in volatile heap memory [B1 Page 159, B5 Page 443].
+* **Text vs. Binary Streams:** Text files represent data as individual character blocks (applying encoding transformations like UTF-8), while binary files handle raw, unmodified byte-streams (e.g., images, compressed packages) [B5 Page 442, B2 Page 180–181].
+* **Matrix of File Opening Access Modes:**
+  * `'r'` / `'rb'`: Read-only. Stream cursor positioned at the absolute start (0). Raises FileNotFoundError if the file is absent [B5 Page 443].
+  * `'w'` / `'wb'`: Write-only. Erases existing contents (truncates) or creates a new file if absent [B5 Page 443].
+  * `'a'` / `'ab'`: Append-only. Cursor placed at the absolute end. New data is appended; existing data is preserved [B5 Page 443].
+  * `'+'` Modifier (`'r+'`, `'w+'`, `'a+'`): Enables dual read and write pipelines. Modifies behavior based on primary mode limits [B5 Page 443–444].
+* **Stream Reading API Evaluations:**
+  * `.read(n)`: Reads `n` bytes/characters as a single string. If `n` is omitted, reads the entire remaining file. High memory overhead for large files [B1 Page 161, B5 Page 446].
+  * `.readline()`: Reads the stream up to and including the next newline (`\n`) character. Returns an empty string `""` at EOF [B1 Page 161].
+  * `.readlines()`: Loads the entire remaining stream into a list of strings where each element is a line. High memory consumption [B1 Page 161].
+* **High-Performance Lazy Line Iteration:** Iterating directly over the file object using a `for line in file_object` loop. This utilizes a lazy buffer generator, loading only one line into memory at a time [B1 Page 162].
+* **Stream Writing API:**
+  * `.write(string)`: Writes a character string to the stream. Does not append newlines automatically [B1 Page 162].
+  * `.writelines(list_of_strings)`: Writes a sequence of strings to the stream sequentially [B1 Page 162].
+* **The Closing Policy:** Failing to call `.close()` locks files in the OS file descriptor table, prevents buffered data from flushing to disk, and can result in memory leaks or corrupted writes [B1 Page 160, B5 Page 444, B2 Page 181].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B1:** Section 5.9 ("File Processing") — Section 5.9.2 ("File Processing") (pp. 159–163) [B1].
+    * **B5:** Chapter 17 ("Files in Python") — Types of Files (p. 442); Opening and Closing Files (pp. 443–444); Working with Text Files (pp. 446–449) [B5].
+    * **B2:** Chapter 8 ("Reading and Writing Files") — The File Reading/Writing Process (pp. 180–184) [B2].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Write a script demonstrating the raw performance and memory optimization of lazy line iteration compared to `.read()` and `.readlines()` on a text file:
+
+    ```python
+    # Writing a sample multi-line file
+    with open('log_report.txt', 'w') as out_file:
+        out_file.write("DEBUG: User logged in\n")
+        out_file.write("INFO: Database connection established\n")
+        out_file.write("ERROR: Query timeout on transaction\n")
+
+    # Demonstration 1: Using readlines() (Creates a complete list in memory)
+    print("--- Demonstration 1: readlines() ---")
+    with open('log_report.txt', 'r') as file_in:
+        lines_list = file_in.readlines()
+        print("Type returned:", type(lines_list))
+        for line in lines_list:
+            print("Line:", line.rstrip())
+
+    # Demonstration 2: Lazy Generator Loop (Highly optimized, O(1) space complexity)
+    print("\n--- Demonstration 2: Lazy Generator Loop ---")
+    with open('log_report.txt', 'r') as file_in:
+        print("Type of file object is iterable:", hasattr(file_in, '__iter__'))
+        for line in file_in:  # File object acts as a generator stream
+            print("Buffered Line:", line.rstrip())
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 3: Context Managers and Exception-Safe File I/O
+
+### **Lesson Objective**
+Students will design robust, exception-safe file input/output pipelines utilizing Python's `with` context manager statement and structure layered `try-except-else-finally` exception-handling blocks [B5 Ch. 16, 17, PCC Ch. 10].
+
+### **Core Concepts**
+* **The Context Manager Protocol:** The `with` statement guarantees resource cleanup. Under the hood, the block invokes the context manager's `__enter__()` method upon entry, and guarantees the execution of `__exit__()` upon exit—even if unhandled runtime exceptions are raised inside the block [B5 Page 452].
+* **Automatic Stream Closure:** In a `with open(...) as file` block, the file object's `close()` method is automatically called immediately upon exiting the scope of the block [B5 Page 452].
+* **Robust Exception Safety:** File operations are highly prone to operating system errors. Programs must anticipate and handle:
+  * `FileNotFoundError`: Trying to read a file that does not exist at the specified path [PCC Page 203].
+  * `PermissionError`: Trying to access or write to a restricted system file or folder without sufficient user privilege.
+  * `UnsupportedOperation`: Attempting write actions on a stream opened in read-only mode [B5 Page 422].
+* **Structuring the I/O Block:**
+  * `try`: Encloses dangerous operations (file open, stream read, stream write) [B5 Page 428, PCC Page 200].
+  * `except`: Captures specific system exceptions and prevents program crash [B5 Page 428, PCC Page 201].
+  * `else`: Executes blocks only if the `try` block ran without raising any exceptions [B5 Page 428, PCC Page 202].
+  * `finally`: Guarantees cleanup execution (e.g., forcing a stream closure if not using a context manager), regardless of execution success or failure [B5 Page 428].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B5:** Chapter 16 ("Exceptions") — try-except-else-finally (pp. 427–429); Chapter 17 ("Files in Python") — The with Statement (p. 452) [B5].
+    * **PCC:** Chapter 10 ("Files and Exceptions") — Exceptions (pp. 200–207); Handling the FileNotFoundError Exception (pp. 203–204) [PCC].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Demonstrate a professional exception-safe logging system that safely opens a target file, logs user action parameters, handles hardware system interruptions, and uses the `else` block to log execution success:
+
+    ```python
+    import sys
+
+    def log_transaction(user_id, amount):
+        file_path = "transactions.log"
+
+        try:
+            # Try opening the file in append text mode
+            # Using with context manager ensures cleanup even if writes fail
+            with open(file_path, "a") as log_file:
+                log_entry = f"USER: {user_id} | TRANSACTION: ${amount:.2f}\n"
+                log_file.write(log_entry)
+
+        except FileNotFoundError:
+            print(f"Error: Target path '{file_path}' could not be resolved.", file=sys.stderr)
+        except PermissionError:
+            print(f"Error: Insufficient permission to write to '{file_path}'.", file=sys.stderr)
+        except Exception as unexpected_error:
+            print(f"An unexpected system exception occurred: {unexpected_error}", file=sys.stderr)
+        else:
+            # Executes ONLY if try completed successfully
+            print(f"Success: Log parsed successfully for user {user_id}.")
+
+    # Demonstrations
+    log_transaction("user_102", 450.75)
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 4: File Pointer Navigation and Random Access
+
+### **Lesson Objective**
+Students will manage stream cursors within binary and text files using byte positioning, tracking offset positions with `.tell()`, and applying random-access navigation via `.seek()` [B5 Ch. 17].
+
+### **Core Concepts**
+* **The Stream Pointer:** Stream operations are sequential. As reading or writing occurs, the file pointer shifts by the byte-length of the data processed [B5 Page 456].
+* **Tracking Position (.tell()):** Returns an integer representing the current byte offset of the file pointer relative to the absolute start of the file [B5 Page 456].
+* **Stream Navigation (.seek(offset, fromwhere)):** Moves the stream cursor to a custom position:
+  * `offset`: The signed integer byte distance to move the pointer [B5 Page 456].
+  * `fromwhere`: Specifies the reference point for the offset:
+    * `0` (Default): Beginning of the file. The cursor is placed at `0 + offset`. Offset must be positive [B5 Page 456].
+    * `1`: Current cursor position. Cursor is placed at `current + offset`. Only allowed in binary mode [B5 Page 456].
+    * `2`: End of the file. Cursor is placed at `EOF + offset`. Commonly used with negative offsets to read backwards. Only allowed in binary mode [B5 Page 456–457].
+* **Text Mode Restriction:** In standard Python 3 text streams, `.seek()` is restricted to absolute seek operations from the start of the file (`fromwhere=0`), or seeks targeting the exact value returned by a previous `.tell()` call. Seeking with relative positions (`fromwhere=1` or `2`) raises `io.UnsupportedOperation` [B5 Page 457].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B5:** Chapter 17 ("Files in Python") — The seek() and tell() Methods (pp. 456–457); Random Accessing of Binary Files (pp. 457–464) [B5].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Write a binary file parsing demonstration that writes integer records, and then uses seek parameters to read the binary file backwards:
+
+    ```python
+    # Write a sample binary file containing bytes
+    # b prefix denotes a raw byte-string literal
+    with open('binary_data.bin', 'wb') as bin_out:
+        bin_out.write(b'abcdefghijklmnopqrstuvwxyz')
+
+    # Read random segments using seek and tell
+    with open('binary_data.bin', 'rb') as bin_in:
+        print("Initial Cursor Position:", bin_in.tell()) # Expect 0
+
+        # Read first 5 bytes
+        chunk1 = bin_in.read(5)
+        print("Chunk 1 read:", chunk1)
+        print("Cursor Position after read(5):", bin_in.tell()) # Expect 5
+
+        # Seek to byte 10 from the beginning (fromwhere=0)
+        bin_in.seek(10, 0)
+        print("\nSeeked to byte 10 from start. Current position:", bin_in.tell())
+        print("Character at position 10:", bin_in.read(1)) # Should print 'k'
+
+        # Seek back 4 bytes from current cursor position (fromwhere=1)
+        bin_in.seek(-4, 1)
+        print("\nSeeked back 4 bytes from current. Current position:", bin_in.tell())
+        print("Character at new position:", bin_in.read(1)) # Should print 'h'
+
+        # Seek to 5 bytes before the end of the file (fromwhere=2)
+        bin_in.seek(-5, 2)
+        print("\nSeeked to 5 bytes from end. Current position:", bin_in.tell())
+        print("Last 5 characters of file:", bin_in.read().decode())
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 5: Structured Plaintext Persistence: Parsing and Writing CSV Files
+
+### **Lesson Objective**
+Students will read, parse, and write structured matrix datasets stored as Comma-Separated Values (CSV) using the standard `csv` library, ensuring safety against Windows newline insertion bugs and handling escape sequences [B2 Ch. 14, PCC Ch. 16].
+
+### **Core Concepts**
+* **The CSV Format Structure:** CSV is a simplified spreadsheet stored as plaintext. Rows are separated by carriage returns/newlines, and individual cells are delimited by commas [B2 Page 319, PCC Page 649].
+* **Escape Sequences & Parsing Hazards:** Relying on basic string splitting (`line.split(',')`) is highly fragile. If a cell contains a literal comma (e.g., `"New York, USA"`), standard splitting corrupts the database. The `csv` module natively parses RFC 4180 escape standards [B2 Page 321–322].
+* **The csv.reader Stream:** Wraps a text file object, parsing each line dynamically and yielding row records as lists of strings in a loop [B2 Page 321–322, PCC Page 650].
+* **The csv.writer Stream:** Writes records to a CSV file. The `.writerow(list)` method takes a list of data cells, formats them dynamically with quotes when needed, and writes them to the file [B2 Page 322–323].
+* **Windows Newline Padding Bug:** On Windows platforms, omitting `newline=''` when invoking `open()` for writing causes Excel-compatible CSV writers to output double-spaced blank rows. Always open CSV streams with `newline=''` [B2 Page 323, 325].
+* **Custom Delimiters:** Standardizing tab-separated spreadsheets (TSV) by specifying custom delimiters (`delimiter='\t'`) and customizing line terminators (`lineterminator='\n'`) inside the writer constructor [B2 Page 323].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B2:** Chapter 14 ("Working with CSV Files and JSON Data") — The csv Module (pp. 320–324); Project: Removing the Header from CSV Files (pp. 324–327) [B2].
+    * **PCC:** Chapter 16 ("Downloading Data") — The CSV File Format (pp. 649–651); Highs and Lows Plot (pp. 651–652) [PCC].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Write an automated database cleanup script that reads a raw, messy CSV customer registry, fixes newline padding bugs, strips whitespace, and writes a clean CSV:
+
+    ```python
+    import csv
+
+    raw_dataset = [
+        ["CustomerID", "Name", "Location"],
+        ["101", "  Robert Downy  ", "New York, NY"],
+        ["102", "Sarah Connor", "Los Angeles, CA"],
+        ["103", "Bruce Wayne", "Gotham City, NJ"]
+    ]
+
+    # 1. Write the raw messy CSV to disk
+    # Crucial: newline='' prevents empty spacing rows on Windows platforms
+    with open('customers_raw.csv', 'w', newline='', encoding='utf-8') as out_file:
+        writer = csv.writer(out_file)
+        writer.writerows(raw_dataset)
+
+    # 2. Parse, clean data cells, and write a formatted output
+    with open('customers_raw.csv', 'r', encoding='utf-8') as src_file:
+        reader = csv.reader(src_file)
+        headers = next(reader) # Extract the first header row
+
+        cleaned_rows = []
+        for row in reader:
+            cust_id = row[0].strip()
+            name = row[1].strip()
+            location = row[2].strip()
+            cleaned_rows.append([cust_id, name, location])
+
+    # Write back cleaned data
+    with open('customers_clean.csv', 'w', newline='', encoding='utf-8') as clean_file:
+        # Specifying a custom tab delimiter transforms the file format to TSV
+        writer = csv.writer(clean_file, delimiter='\t')
+        writer.writerow(headers)
+        writer.writerows(cleaned_rows)
+
+    print("CSV Database Cleanup Complete. Clean File written as TSV format.")
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 6: Structured Object Serialization: JSON and Binary Pickling
+
+### **Lesson Objective**
+Students will serialize and deserialize Python heap objects, comparing standard-compatible, human-readable JSON streams with Python-specific, high-performance binary pickle serialization [B5 Ch. 17, B2 Ch. 14, PCC Ch. 10].
+
+### **Core Concepts**
+* **Object Serialization (Marshalling):** The process of translating a live heap-allocated Python object structure into an equivalent sequential byte-string or character stream suitable for file-storage or network transmission [B5 Page 452, PCC Page 637].
+* **JSON (JavaScript Object Notation) Pipelines:**
+  * A universally compatible, lightweight plaintext format [B2 Page 327, PCC Page 638].
+  * **Data Type Boundaries:** JSON can store only basic primitive types: strings, integers, floats, booleans, lists, dictionaries, and None [B2 Page 328]. Python-specific classes, datetime objects, and byte streams are unsupported.
+  * **Memory-to-String APIs:** `json.dumps(obj)` converts a Python object to a JSON formatted string; `json.loads(str)` parses a JSON string into a Python object structure [B2 Page 328–329].
+  * **Disk-to-File APIs:** `json.dump(obj, file_obj)` writes object directly to a JSON file; `json.load(file_obj)` parses a JSON file into a Python object directly [PCC Page 209].
+* **Pickling (Python Serialization):**
+  * A Python-specific binary serialization protocol [B5 Page 452].
+  * Can serialize almost any complex, nested custom class instance or custom data structure [B5 Page 453].
+  * **Methods:** Using the `pickle` module: `pickle.dump(obj, file_obj)` writes object as byte stream; `pickle.load(file_obj)` rebuilds object [B5 Page 454].
+  * **Critical Security Policy:** Never unpickle data from untrusted sources. Rebuilding an object from an unverified pickled file can execute arbitrary malicious code on the host system.
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B5:** Chapter 17 ("Files in Python") — Pickle in Python (pp. 452–456) [B5].
+    * **B2:** Chapter 14 ("Working with CSV Files and JSON Data") — JSON and APIs (pp. 327–328); The json Module (pp. 328–329) [B2].
+    * **PCC:** Chapter 10 ("Files and Exceptions") — Storing Data (pp. 208–214) [PCC].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Demonstrate saving a user settings dictionary using JSON, and saving a complex custom class instance using Pickle side-by-side:
+
+    ```python
+    import json
+    import pickle
+
+    # Class for Pickling demonstration
+    class StudentProfile:
+        def __init__(self, sid, name, grade):
+            self.sid = sid
+            self.name = name
+            self.grade = grade
+        def introduce(self):
+            return f"ID: {self.sid} | Name: {self.name} | Grade: {self.grade}"
+
+    # 1. JSON Persistence (Standard compatible, plain text)
+    user_settings = {"theme": "dark", "fontSize": 14, "autoSave": True}
+    with open('settings.json', 'w') as json_out:
+        json.dump(user_settings, json_out)
+
+    # 2. PICKLE Persistence (Python-specific binary serialization)
+    student1 = StudentProfile(505, "Harsh Deep", "A+")
+    # Pickle requires binary writing mode ('wb')
+    with open('student.pkl', 'wb') as pickle_out:
+        pickle.dump(student1, pickle_out)
+
+    # --- Reading data back ---
+    # Load JSON
+    with open('settings.json', 'r') as json_in:
+        loaded_settings = json.load(json_in)
+        print("JSON Loaded dictionary:", loaded_settings)
+
+    # Load Pickle
+    with open('student.pkl', 'rb') as pickle_in:
+        loaded_student = pickle.load(pickle_in)
+        print("Pickle Reconstructed Object:")
+        print("  -> Object Type:", type(loaded_student))
+        print("  -> Execution Method Output:", loaded_student.introduce())
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 7: Python Standard Library Modules (math, sys, and datetime)
+
+### **Lesson Objective**
+Students will integrate standard library utility modules (`math`, `sys`, `datetime`) to calculate numeric operations, retrieve runtime command-line execution parameters, and parse, manipulate, and format chronological timestamps [B5 Ch. 4, 20, B2 Ch. 15, B3 Ch. 5].
+
+### **Core Concepts**
+* **The math Module:** Direct programmatic library mapping standard C-based trigonometric, power, rounding, and algorithmic functions [B5 Page 88].
+* **The sys Module:** Systems execution interface.
+  * `sys.argv`: List containing all command line arguments passed to a running script. `sys.argv[0]` represents the script name itself [B5 Page 110, B2 Page 304].
+  * `sys.path`: List of folder directories Python searches dynamically to locate imported modules [B5 Page 218].
+  * `sys.exit()`: Terminates the execution stack of the PVM, returning an optional exit status code [B5 Page 220, B2 Page 58].
+* **The datetime Module:** Epoch calculations and time delta logic.
+  * `datetime.date`, `datetime.time`, and composite `datetime.datetime` [B5 Page 515, B2 Page 335].
+  * **Time deltas:** Using `timedelta` objects to represent durations and execute arithmetic operations on calendars (e.g., target due date = current date + `timedelta`) [B5 Page 517].
+  * **Parsing and Formatting:**
+    * `.strftime(format_mask)`: Formats a `datetime` object into a human-readable string based on formatting directives (e.g., `%Y-%m-%d`) [B5 Page 518, B2 Page 344].
+    * `.strptime(date_str, format_mask)`: Parses a plain string into a structured `datetime` object [B5 Page 521].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B5:** Chapter 4 ("Operators in Python") — Mathematical Functions (pp. 88–90); Chapter 20 ("Date and Time") — Dates, times, timedelta (pp. 515–523) [B5].
+    * **B2:** Chapter 15 ("Keeping Time, Scheduling Tasks") — The time Module, datetime Module, timedelta (pp. 335–347) [B2].
+    * **B3:** Chapter 5 ("Functions and Modules") — Section 5.11 ("Modules in Python") (pp. 217–221) [B3].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Write a command-line script that accepts a project due date as a string command argument, parses it, calculates the remaining days relative to the current local system time, and reports safety alerts:
+
+    ```python
+    import sys
+    from datetime import datetime
+
+    def check_deadline_urgency():
+        # Verify if argument was provided
+        if len(sys.argv) < 2:
+            print("Usage Error: Please supply deadline date in YYYY-MM-DD format.")
+            print("Example: python check_deadline.py 2026-08-15")
+            sys.exit(1) # Exit execution early with error status
+
+        deadline_str = sys.argv[1]
+
+        try:
+            # Parse string into structured datetime
+            deadline_dt = datetime.strptime(deadline_str, "%Y-%m-%d")
+        except ValueError:
+            print("Format Error: Deadline must match exactly YYYY-MM-DD template.")
+            sys.exit(1)
+
+        current_dt = datetime.now()
+
+        # Calculate duration delta
+        delta = deadline_dt - current_dt
+
+        print(f"Current Date: {current_dt.strftime('%A, %B %d, %Y')}")
+        print(f"Deadline Date: {deadline_dt.strftime('%A, %B %d, %Y')}")
+
+        if delta.days < 0:
+            print(f"\nStatus: Overdue! The project is past deadline by {abs(delta.days)} days.")
+        elif delta.days <= 3:
+            print(f"\nStatus: CRITICAL ALERT! Only {delta.days} days remaining to submit.")
+        else:
+            print(f"\nStatus: Safe. You have {delta.days} days left to submit the project.")
+
+    if __name__ == '__main__':
+        check_deadline_urgency()
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 8: Custom Module Design, Namespace Engineering, and Python execution Boundaries
+
+### **Lesson Objective**
+Students will engineer reusable, self-contained custom libraries, structure modular packages, manage imports cleanly to avoid namespace pollution, and construct execution bounds using the special variable `__name__` [B5 Ch. 9, B1 Sec 5.11, B3 Sec 5.11].
+
+### **Core Concepts**
+* **The Modularization Philosophy:** Dividing large software files into small, easily maintainable, and reusable files (modules) containing related functions, classes, and variables [B5 Page 277].
+* **Syntax of Importing namespaces:**
+  * `import custom_module`: Accesses resources through explicit dot notation (e.g., `custom_module.calculate()`). Best practice to protect namespace integrity and prevent naming collisions [B5 Page 218].
+  * `from custom_module import calculate`: Binds the specific name directly into the caller namespace [B5 Page 218].
+  * `from custom_module import *`: Pollutes the local namespace by importing all identifiers. Highly dangerous as it silently overrides local definitions without raising warnings [B5 Page 218].
+  * `as aliases`: Creating local aliases for imported namespaces to prevent collisions (`import pandas as pd`) [B5 Page 219].
+* **The Special Variable `__name__`:** Dynamically updated by the PVM [B5 Page 279, B1 Page 215].
+  * When a script is executed directly (e.g., `python script.py`), Python assigns the string `'__main__'` to `__name__` [B5 Page 279, B1 Page 215].
+  * When a script is imported as a module into another script (e.g., `import script`), Python assigns the actual filename of the module (`'script'`) to `__name__` [B5 Page 279, B1 Page 215].
+* **The Execution Shield (`if __name__ == '__main__':`):** Placing script execution routines inside this block allows modules to act as dual-mode entities: they execute standalone scripts when run directly, but act as silent, clean libraries when imported elsewhere without executing their script procedures [B5 Page 279, B1 Page 215].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B5:** Chapter 9 ("Functions") — Section 9.11 ("Creating our Own Modules") (pp. 277–278); Section 9.12 ("The Special Variable __name__") (pp. 279–280) [B5].
+    * **B1:** Chapter 5 ("Sequences: Strings, Lists, and Files") — Section 5.11.3 ("Creating custom imported module files") (p. 215) [B1].
+    * **B3:** Chapter 5 ("Functions and Modules") — Sections 5.11 & 5.12 ("Modules and Packages in Python") (pp. 217–225) [B3].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Write a two-file modular package containing a custom mathematics utility library (`math_utility.py`) protected by a `__name__` shield, and import its resources from a main execution module (`main_app.py`):
+
+    ```python
+    # Save this code as math_utility.py
+    """
+    UGIE Custom Math Utility Library Module.
+    Provides geometry formula calculations.
+    """
+
+    def calculate_cylinder_volume(radius, height):
+        """Returns the computed volume of a cylinder."""
+        import math # Scope import locally
+        return math.pi * (radius ** 2) * height
+
+    def calculate_cone_volume(radius, height):
+        """Returns the computed volume of a cone."""
+        return (1/3) * calculate_cylinder_volume(radius, height)
+
+    # Execution boundaries shield
+    if __name__ == '__main__':
+        # This block will ONLY execute if math_utility.py is run directly.
+        # It will be ignored if math_utility.py is imported!
+        print("--- math_utility.py: Running Self-Diagnostic Test ---")
+        test_radius = 5
+        test_height = 10
+        print(f"Diagnostic Volume: {calculate_cylinder_volume(test_radius, test_height):.2f}")
+    ```
+
+    ```python
+    # Save this code as main_app.py in the same directory
+    import math_utility
+
+    def run_application():
+        print("--- Welcome to UGIE Modular Application ---")
+        # Access math_utility using explicit namespace notation
+        radius = 12.0
+        height = 25.0
+
+        cyl_vol = math_utility.calculate_cylinder_volume(radius, height)
+        cone_vol = math_utility.calculate_cone_volume(radius, height)
+
+        print(f"Cylinder Volume: {cyl_vol:.4f}")
+        print(f"Cone Volume: {cone_vol:.4f}")
+        print(f"Module imported name verified: {math_utility.__name__}")
+
+    if __name__ == '__main__':
+        run_application()
+    ```
+  </Accordion>
+</Accordions>
+
+---

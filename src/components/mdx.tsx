@@ -6,6 +6,8 @@ import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 // component injections
 import { Button, buttonVariants } from '@/components/ui/button';
 import { DocViewer } from '@/components/ui/doc-viewer';
+import { ExecutionSimulator } from '@/components/ui/execution-simulator';
+import { Quiz } from '@/components/ui/quiz';
 
 export function getMDXComponents(components?: MDXComponents) {
   return {
@@ -21,6 +23,12 @@ export function getMDXComponents(components?: MDXComponents) {
 
     // doc viewer
     DocViewer,
+
+    // execution simulator
+    ExecutionSimulator,
+
+    // interactive quiz
+    Quiz,
   } satisfies MDXComponents;
 }
 

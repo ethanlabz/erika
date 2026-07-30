@@ -1,0 +1,337 @@
+---
+title: UNIT V
+---
+
+# Object-Oriented Programming (OOP) in Python
+
+**Core Curriculum Focus:** High-level paradigms transition, class/object memory addresses, the variable reference address model (self), constructors, class vs. instance namespaces, method classification, name mangling encapsulation, single/multilevel/multiple inheritance, Method Resolution Order (MRO) with C3 Linearization, polymorphism and duck typing, Abstract Base Classes (ABC), magic methods, operator overloading, and robust resource safety exception handlers.
+
+### **Textbook Priority Order**
+1. **B5:** *Core Python Programming* (Dr. R. Nageswara Rao, 2nd Edition) [B5]
+2. **B1:** *Python Programming: An Introduction to Computer Science* (John M. Zelle, 3rd Edition) [B1]
+3. **B3:** *Python Programming Using Problem Solving Approach* (Reema Thareja) [B3]
+4. **PCC:** *Python Crash Course* (Eric Matthes, 3rd Edition) [PCC]
+
+---
+
+## MODULE 1: Paradigms Shift — Procedural (C) vs. Object-Oriented (OOP) Programming
+
+### **Lesson Objective**
+Students will be able to analyze the conceptual and architectural transition from procedural (C-style) programming to Object-Oriented Programming (OOP), explaining how OOP groups state (attributes) and behavior (methods) into cohesive classes [B5 Ch. 12, B1 Ch. 12, B3 Ch. 9].
+
+### **Core Concepts**
+* **The Paradigm Shift:** Contrast procedural programming (where code is structured as sequential instructions and functions acting on global variables) with OOP (which structures software as interactive collections of objects containing internal state data and methods) [B3 Page 377, B5 Page 347].
+* **CPython Class Namespaces:** Classes behave as namespace blueprints on the heap [B5 Page 348].
+* **CPython Object Instance Memory Layout:** Instances are dynamically allocated heap objects [B5 Page 348]. An object contains an internal `__dict__` mapping its instance attributes to value references [B5 Page 353].
+* **The self Reference:** Demystify `self`. Explain that `self` is not a keyword, but a variable reference pointing to the memory address of the current active instance invoking the method [B5 Page 354, B3 Page 381].
+* **The Constructor (`__init__`):** An initialization routine invoked by the PVM immediately after a new instance has been allocated in memory, initializing instance namespaces [B5 Page 353, B1 Page 415].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B5:** Chapter 12 ("Classes and Objects") — Object-Oriented Paradigm (pp. 347–348); Creating a Class and Object (pp. 349–351); The self Variable (p. 354); Constructors (pp. 352–353) [B5].
+    * **B1:** Chapter 12 ("Defining Classes") — Section 12.1 ("Quick Review of Objects") (pp. 411–414); Section 12.2 ("Example Multi-sided Die") (pp. 414–418) [B1].
+    * **B3:** Chapter 9 ("Classes and Objects") — Introduction (pp. 377–378); Designing Classes (pp. 379–384) [B3].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Write a Python class, print the memory addresses of instance objects dynamically, inspect their internal `__dict__` namespaces, and prove that `self` points to the instance address:
+
+    ```python
+    class DeviceNode:
+        def __init__(self, node_id, status):
+            # Inspect memory addresses inside the constructor
+            print(f"[Constructor] self reference address: {hex(id(self))}")
+            self.node_id = node_id  # Binds key 'node_id' to instance dict
+            self.status = status
+
+    # Instantiate two nodes
+    node_a = DeviceNode("N-204", "Active")
+    print(f"[Caller] node_a reference address:   {hex(id(node_a))}\n")
+
+    node_b = DeviceNode("N-501", "Standby")
+    print(f"[Caller] node_b reference address:   {hex(id(node_b))}\n")
+
+    # Inspect internal namespaces
+    print("node_a namespace dict:", node_a.__dict__)
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 2: Attribute Scoping, Namespaces, and Method Classifications
+
+### **Lesson Objective**
+Students will distinguish between Class Attributes and Instance Attributes, and classify methods into Instance Methods, Class Methods (factory interfaces), and Static Methods (stateless utilities) [B5 Ch. 12, B3 Ch. 9].
+
+### **Core Concepts**
+* **Class vs. Instance Namespace Attributes:**
+  * **Class Attributes:** Defined directly in the class body. Shared by all instances. Accessing or modifying them updates the shared value across the class [B5 Page 358].
+  * **Instance Attributes:** Defined inside constructors or methods using `self.name`. Unique to each instance object [B5 Page 358].
+* **Method Classifications:**
+  * **Instance Methods:** Accept `self` as the first argument. Can access and modify instance-specific data [B5 Page 354].
+  * **Class Methods:** Wrapped in `@classmethod`. Accept `cls` as the first argument. Modify class-level state and act as alternative constructor (factory) patterns [B5 Page 370].
+  * **Static Methods:** Wrapped in `@staticmethod`. Accept no implicit positional arguments (`self` or `cls`). Behave as regular functions inside the class namespace for logical grouping [B5 Page 372].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B5:** Chapter 12 ("Classes and Objects") — Class Variables vs Instance Variables (pp. 358–361); Types of Methods: Instance Methods, Class Methods, Static Methods (pp. 370–374) [B5].
+    * **B3:** Chapter 9 — Section 9.7 ("Class Methods") (pp. 385–386); Section 9.8 ("Static Methods") (pp. 386–388) [B3].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Write a database connection helper class containing Class and Instance attributes, a Class Method factory, and a Static Method utility:
+
+    ```python
+    class ConnectionHelper:
+        # Class Attribute: Shared counter
+        active_connections = 0
+
+        def __init__(self, connection_url):
+            self.connection_url = connection_url  # Instance Attribute
+            ConnectionHelper.active_connections += 1
+
+        @classmethod
+        def create_local_connection(cls, port):
+            """Class Method acting as an alternative factory constructor."""
+            local_url = f"localhost:{port}"
+            return cls(local_url)
+
+        @staticmethod
+        def parse_ip(url):
+            """Static Method acting as a stateless utility."""
+            return url.split(":")[0]
+
+    # Demonstrate connections
+    conn1 = ConnectionHelper("10.0.0.1:8080")
+    conn2 = ConnectionHelper.create_local_connection(3000)
+
+    print("Connection 1 IP:", ConnectionHelper.parse_ip(conn1.connection_url))
+    print("Connection 2 IP:", ConnectionHelper.parse_ip(conn2.connection_url))
+    print("Active Connection Count:", ConnectionHelper.active_connections)
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 3: Encapsulation and Data Hiding (Name Mangling)
+
+### **Lesson Objective**
+Students will enforce encapsulation by protecting class attributes from external modifications using public, protected, and private (name mangling) conventions [B5 Ch. 12, B3 Ch. 9].
+
+### **Core Concepts**
+* **The Encapsulation Philosophy:** Restricting direct access to an object's internal data to prevent accidental state corruption, exposing modifications only through defined interfaces (getters/setters) [B3 Page 411, B5 Page 348].
+* **Access Control Conventions:**
+  * **Public Attributes:** No prefix (e.g., `value`). Accessible from anywhere [B5 Page 353].
+  * **Protected Attributes:** Single underscore prefix (e.g., `_value`). A developer agreement indicating the attribute should not be accessed outside the class or its subclasses [B5 Page 381].
+  * **Private Attributes:** Double underscore prefix (e.g., `__value`). Python strictly enforces access protection through Name Mangling [B5 Page 381].
+* **Name Mangling Mechanics:** When compiling a private attribute `__attribute` in class `MyClass`, the compiler alters the identifier name to `_MyClass__attribute` in the object's `__dict__` namespace, preventing accidental external overrides or access [B5 Page 381, B3 Page 412].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B5:** Chapter 12 ("Classes and Objects") — Data Hiding, public, protected, and private members (pp. 381–382) [B5].
+    * **B3:** Chapter 9 ("Classes and Objects") — Section 9.14 ("Data Hiding") (pp. 411–413) [B3].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Define a class containing public, protected, and private variables. Inspect the internal `__dict__` namespace to show name mangling, and demonstrate how attempting to access the private attribute raises an AttributeError:
+
+    ```python
+    class BankAccount:
+        def __init__(self, owner, balance):
+            self.owner = owner          # Public
+            self._account_type = "Check" # Protected
+            self.__balance = balance     # Private (mangled)
+
+    account = BankAccount("Sanjay", 50000.0)
+
+    print("Public Name:", account.owner)
+    print("Protected Type:", account._account_type)
+
+    # Attempting to access mangled name directly
+    try:
+        print(account.__balance)
+    except AttributeError as err:
+        print("Blocked! AttributeError:", err)
+
+    # Accessing mangled name via compiler representation
+    print("Mangled Balance:", account._BankAccount__balance)
+    print("Object Namespace keys:", account.__dict__.keys())
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 4: Inheritance Models (Single, Multilevel, Multiple) and C3 MRO Linearization
+
+### **Lesson Objective**
+Students will design single, multilevel, and multiple inheritance structures, manage parent calls using `super()`, and calculate Method Resolution Order (MRO) using C3 Linearization [B5 Ch. 13, B3 Ch. 10].
+
+### **Core Concepts**
+* **Inheritance:** Code reuse mechanism where a subclass inherits attributes and methods from a base class [B5 Page 383, B3 Page 419].
+* **Inheritance Types:**
+  * **Single Inheritance:** Subclass inherits from one base class [B5 Page 384].
+  * **Multilevel Inheritance:** A class inherits from a subclass (e.g., A $\rightarrow$ B $\rightarrow$ C) [B5 Page 386].
+  * **Multiple Inheritance:** Subclass inherits from more than one base class [B5 Page 388].
+* **The super() function:** Invokes methods of the parent class, ensuring constructors in the parent hierarchy execute properly (constructor chaining) [B5 Page 394].
+* **The Diamond Problem:** An ambiguity occurring in multiple inheritance when a class inherits from two parent classes that share a common ancestor base class [B5 Page 389].
+* **Method Resolution Order (MRO) & C3 Linearization:** The algorithm Python uses to flatten multiple inheritance hierarchies into a single search path.
+  * MRO is calculated recursively based on the C3 Linearization rules [B5 Page 390]:
+    $$L[C(B_1 \dots B_N)] = C + \text{merge}(L[B_1] \dots L[B_N], B_1 \dots B_N)$$
+  * **Merge Rule:** Take the head of the first list. If this head is not in the tail (any position other than the first) of any other list, select it, add it to the MRO, and remove it from all lists. Repeat until all lists are cleared or no candidate can be selected (raising an MRO conflict exception) [B5 Page 390].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B5:** Chapter 13 ("Inheritance and Polymorphism") — Single Inheritance (p. 384); Multilevel Inheritance (p. 386); Multiple Inheritance (p. 388); Method Resolution Order (MRO) (pp. 389–391); Constructors in Inheritance & super() (pp. 394–398) [B5].
+    * **B3:** Chapter 10 ("Inheritance") — Introduction (pp. 419–420); Types of Inheritance (pp. 420–425) [B3].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Write a diamond-shaped class hierarchy. Trace the execution path of constructors using `super()`, and print the calculated MRO list to verify C3 Linearization:
+
+    ```python
+    class A:
+        def __init__(self):
+            print("Constructor A")
+            super().__init__()
+
+    class B(A):
+        def __init__(self):
+            print("Constructor B")
+            super().__init__()
+
+    class C(A):
+        def __init__(self):
+            print("Constructor C")
+            super().__init__()
+
+    class D(B, C):
+        def __init__(self):
+            print("Constructor D")
+            super().__init__()
+
+    # Instantiate child D
+    print("--- Constructor Execution sequence ---")
+    d = D()
+
+    print("\n--- Method Resolution Order (MRO) for class D ---")
+    for cls in D.__mro__:
+        print(cls)
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 5: Polymorphism, Duck Typing, and Abstract Base Classes (ABC)
+
+### **Lesson Objective**
+Students will implement polymorphism, apply Python's duck typing paradigm, and design abstract interfaces using Abstract Base Classes (ABCs) to enforce class constraints [B5 Ch. 13].
+
+### **Core Concepts**
+* **Polymorphism:** The ability of different object classes to respond to the same method interface calls with class-specific behaviors [B5 Page 383].
+* **Duck Typing:** Python's dynamic typing paradigm: *"If it walks like a duck and quacks like a duck, it is a duck."* The interpreter validates method signatures at runtime rather than matching strict class inheritance types [B5 Page 399].
+* **Abstract Base Classes (ABCs):** Classes containing abstract methods that have no implementation. Base classes define parent templates using the `abc.ABC` module and `@abstractmethod` decorator, forcing subclasses to implement the required interface methods before instantiation [B5 Page 403].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B5:** Chapter 13 ("Inheritance and Polymorphism") — Polymorphism (pp. 398–399); Duck Typing (pp. 399–400); Abstract Classes and Interfaces (pp. 403–410) [B5].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Create an abstract interface using ABC. Implement subclass polymorphism, and write a function demonstrating Python's duck typing:
+
+    ```python
+    from abc import ABC, abstractmethod
+
+    # 1. Define Abstract Base Class Interface
+    class NetworkService(ABC):
+        @abstractmethod
+        def send_data(self, payload):
+            pass
+
+    # 2. Implement polymorphic subclasses
+    class HttpService(NetworkService):
+        def send_data(self, payload):
+            print(f"Sending HTTP POST payload: {payload}")
+
+    class MqttService(NetworkService):
+        def send_data(self, payload):
+            print(f"Publishing MQTT packet: {payload}")
+
+    # 3. Duck Typing Demonstration (Needs no inheritance association)
+    class RawSocketLogger:
+        def send_data(self, payload):
+            print(f"Raw socket stream write: {payload}")
+
+    def dispatch_alert(service_object, message):
+        # Calls send_data dynamically (Duck Typing)
+        service_object.send_data(message)
+
+    # Instantiate and run
+    http = HttpService()
+    mqtt = MqttService()
+    logger = RawSocketLogger()
+
+    dispatch_alert(http, "Alert Code 500")
+    dispatch_alert(mqtt, "Sensor reading 24.5")
+    dispatch_alert(logger, "Syslog packet 12")
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 6: Operator Overloading and Magic Methods
+
+### **Lesson Objective**
+Students will overload Python's operators (+, -, ==) and customize built-in object operations (string conversion, length calculation) using magic methods [B5 Ch. 13].
+
+### **Core Concepts**
+* **Magic Methods:** Special predefined methods containing double underscores (dunder methods like `__add__`, `__str__`) that map built-in syntax operators to class behaviors [B5 Page 400].
+* **Operator Mapping:**
+  * **Addition (`+`):** `__add__(self, other)` [B5 Page 400].
+  * **Subtraction (`-`):** `__sub__(self, other)` [B5 Page 400].
+  * **Equality (`==`):** `__eq__(self, other)` [B5 Page 401].
+  * **String Representation (`str()`):** `__str__(self)` returns human-readable text representation [B5 Page 401].
+  * **Internal Representation (`repr()`):** `__repr__(self)` returns unambiguous developer-focused object description [B5 Page 401].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B5:** Chapter 13 ("Inheritance and Polymorphism") — Operator Overloading and Magic Methods (pp. 400–403) [B5].
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Design a custom mathematical 2D vector class and overload the addition and equality operators:
+
+    ```python
+    class Vector2D:
+        def __init__(self, x, y):
+            self.x = x
+            self.y = y
+
+        def __add__(self, other):
+            """Overloads the '+' operator."""
+            return Vector2D(self.x + other.x, self.y + other.y)
+
+        def __eq__(self, other):
+            """Overloads the '==' operator."""
+            return self.x == other.x and self.y == other.y
+
+        def __str__(self):
+            """Overloads the str() representation."""
+            return f"({self.x}i + {self.y}j)"
+
+        def __repr__(self):
+            return f"Vector2D({self.x}, {self.y})"
+
+    # Instantiate vectors
+    v1 = Vector2D(3, 4)
+    v2 = Vector2D(1, 2)
+
+    # Perform operations
+    v3 = v1 + v2  # Invokes v1.__add__(v2)
+    print("v1 + v2 =", v3)
+    print("v1 == v2:", v1 == v2)
+    print("v1 == Vector2D(3,4):", v1 == Vector2D(3, 4))
+    ```
+  </Accordion>
+</Accordions>
+
+---

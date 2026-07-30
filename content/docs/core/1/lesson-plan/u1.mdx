@@ -1,0 +1,283 @@
+---
+title: Unit I
+---
+
+# Introduction to Python
+
+**Core Curriculum Focus:** Overview of Python: Features and Applications, Setting Up the Python Environment (Python Installation, IDEs), Python Syntax: Variables, Tag Reference Model, Built-in Data Types, Operators and Expressions, Execution Pipeline, and Writing & Debugging scripts.
+
+### **Textbook Priority Order**
+1. **B1:** *Python Programming: An Introduction to Computer Science* (John M. Zelle, 3rd Edition)
+2. **B5:** *Core Python Programming* (Dr. R. Nageswara Rao, 2nd Edition)
+3. **B3:** *Python Programming Using Problem Solving Approach* (Reema Thareja)
+4. **PDSH:** *Python Data Science Handbook* (Jake VanderPlas, 2nd Edition)
+
+---
+
+## MODULE 1: Overview of Python (Features & Paradigm Comparisons)
+
+### **Lesson Objective**
+Analyze Python's core characteristics (high-level abstraction, dynamic typing, automatic memory management, and platform independence) and contrast its multi-paradigm architecture (procedural, object-oriented, and functional) with C’s procedural framework and Java's pure class-based model.
+
+### **Core Concepts**
+* **High-Level Abstraction:** High-level languages use English-like structures to maximize algorithmic focus and minimize boilerplate instructions.
+* **Dynamic Typing:** Variable declarations are absent in Python. The runtime interpreter associates types with value objects on the heap dynamically rather than the variable name tags themselves at compile time.
+* **Platform Independence & Portability:** Python source compiles to intermediate, host-agnostic bytecode, which is executed across hardware systems via platform-specific interpreters.
+* **Multi-Paradigm Execution:** Python acts as a hybrid engine, allowing developers to write procedural script-level code, object-oriented software using classes, or functional modules with lambda pipelines.
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B5 (Nageswara Rao):** Chapter 1 ("Introduction to Python") — Salient Features (pp. 3–6); Comparisons between C and Python (pp. 15); Comparisons between Java and Python (pp. 16–17).
+    * **B1 (John M. Zelle):** Preface & Chapter 1 ("Computers and Programs") — Why Python (pp. ix–x); Section 1.5 ("Programming Languages") (pp. 6–9).
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Illustrate **static compile-time type constraint** in C vs. **dynamic run-time binding** in Python on the board:
+
+    ```c
+    /* C Code (Static Type checking) */
+    int result = 100;
+    result = "hundred"; /* Compilation error: incompatible types */
+    ```
+
+    ```python
+    # Python Code (Dynamic reference mapping)
+    result = 100
+    print(type(result))  # Output: <class 'int'>
+
+    result = "hundred"   # Re-binds reference dynamically to a string
+    print(type(result))  # Output: <class 'str'>
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 2: Setting Up the Python Environment (Python Installation, IDEs)
+
+### **Lesson Objective**
+Install Python, configure system variables, verify terminal environments, and execute Python code using both the Interactive Shell (REPL) for fast testing and Script Mode for persistent program storage.
+
+### **Core Concepts**
+* **Verifying System PATH:** Setting environment variables ensures the CPython interpreter and package managers (like `pip`) are accessible globally from any shell terminal.
+* **Interactive Mode (REPL):** Running statements immediately under the triple greater-than (`>>>`) primary prompt. The interpreter dynamically evaluates the expression and auto-prints any return values without requiring explicit print statements.
+* **Script Mode:** Compiling and executing complete code sequences stored as physical `.py` files. In this mode, evaluated expressions do not print output to the console unless passed directly to output statements [B1 Page 34].
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B5 (Nageswara Rao):** Chapter 2 ("Writing Our First Python Program") — Python Setup, PATH Configuration, Installing Packages via `pip` (pp. 19–29); Interactive Mode vs. Script Mode (pp. 31–35).
+    * **B1 (John M. Zelle):** Chapter 1 — Section 1.6 ("The Magic of Python") (pp. 9–14); Section 1.6.1 ("Inside IDLE") (pp. 10–12).
+    * **B2 (Al Sweigart):** Introduction — Starting IDLE, The Interactive Shell.
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Compare the execution differences between evaluating bare values in the REPL shell and running them as a saved script:
+
+    ```python
+    # REPL (Interactive prompt output is automatic)
+    >>> x = 50
+    >>> x * 2
+    100
+    ```
+
+    ```python
+    # script.py (Script mode execution requires explicit print)
+    x = 50
+    x * 2          # Silent evaluation in memory. Prints nothing!
+    print(x * 2)   # Explicit print displays output to stdout
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 3: Python Syntax: Variables and the Tag Reference Model
+
+### **Lesson Objective**
+Contrast C's physical "storage box" variable allocation model with Python's heap-allocated "tag reference" (sticky-note) model, explaining object aliasing, dynamic reference tracking, and garbage collection.
+
+### **Core Concepts**
+* **The Box Model (C):** A variable represents a static physical memory slot on the system stack that directly contains a binary value. Writing a new value overwrites the bits at that specific address.
+* **The Tag Model (Python):** Python values exist as individual objects on the heap. Assigning a variable does not reserve memory for a value; instead, it binds an identifier tag to an existing heap object.
+* **CPython Pointer Overhead:** A C integer takes 4 bytes. A Python integer takes 28 bytes because CPython represents it as a complex C structure (`struct _longobject`) containing reference counting metrics (`ob_refcnt`), type descriptors (`ob_type`), and size headers alongside the raw value.
+* **Reference-Counting Garbage Collection:** Every object tracks how many variable tags are bound to it. When an object's reference count drops to 0, the PVM's memory manager sweeps it from the heap to free memory.
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B1 (John M. Zelle):** Chapter 2 ("Writing Simple Programs") — Section 2.5 ("Assignment Statements") — Sticky-Note model vs. Variable-as-Box model (pp. 36–39).
+    * **B5 (Nageswara Rao):** Chapter 3 ("Datatypes in Python") — Section "How Python Sees Variables" — Memory tags, address lookup using `id()` (pp. 49–51); Garbage Collection (p. 13).
+    * **PDSH (Jake VanderPlas):** Chapter 4 ("Understanding Data Types in Python") — A Python Integer Is More Than Just an Integer (pp. 35–37).
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Show reference sharing (aliasing) and immutability by tracking memory addresses via the built-in `id()` function:
+
+    ```python
+    x = 1000
+    y = x
+    print(id(x) == id(y))  # Output: True (Both variables are tags pointing to the same heap object)
+
+    # Modify x. Since integers are immutable, y is unaffected.
+    x = x + 1
+    print(id(x) == id(y))  # Output: False (x moves to point to a new object '1001'; y still points to '1000')
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 4: Built-in Data Types & Sequence Operations
+
+### **Lesson Objective**
+Categorize Python's built-in data types, perform sequence manipulations using slicing with strides, and execute explicit type conversions (coercion) safely.
+
+### **Core Concepts**
+* **None Type:** Represents a single singleton object (`None`) indicating the absolute absence of a value.
+* **Numeric Types:** Distinguish between fixed-precision standard integers, double-precision floats, and complex numbers (`real + imag j`).
+* **Sequence Types:** Ordered collection types including strings (immutable), tuples (immutable), lists (mutable), and range sequences.
+* **Step-Stride Slicing:** Extracting subsequences with the syntax `sequence[start:stop:step]`. Negative step strides reverse the order.
+* **Explicit Coercion:** Converting variable types explicitly using built-in constructors: `int()`, `float()`, `str()`, and `complex()`.
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B5 (Nageswara Rao):** Chapter 3 ("Datatypes in Python") — Built-in datatypes, None Type, Numeric types, Explicit Type Conversions, Sequences (pp. 51–64); Range Datatype (p. 60).
+    * **B1 (John M. Zelle):** Chapter 3 — Numeric Types; Chapter 5 — Section 5.1 ("String Type"); Section 5.8 ("Type Conversions").
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Demonstrate advanced step slicing syntax and explicit coercion in the shell:
+
+    ```python
+    word = "Python-UGIE"
+    print(word[0:6])    # Output: 'Python' (Slices characters from index 0 up to 6)
+    print(word[::-1])   # Output: 'EIGU-nohtyP' (Negative step reverses the string)
+
+    raw_input = "15"
+    coerced_int = int(raw_input)  # Converts string literal to an integer object
+    print(coerced_int * 2)        # Output: 30
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 5: Operators, Precedence, and Expressions
+
+### **Lesson Objective**
+Construct and evaluate expressions using Python’s operators, adhering strictly to interpreter precedence, associativity hierarchies, and short-circuit evaluation rules.
+
+### **Core Concepts**
+* **Division Variations:** Contrast standard float division (`/`) with integer floor division (`//`) and remainder modulo operations (`%`).
+* **Logical Short-Circuiting:** Logical `and` and `or` operate as short-circuit expressions, evaluating from left to right and returning the actual evaluated operand object rather than a simple boolean flag.
+* **Value Equality vs. Identity:** Structural value comparison (`==`) checks whether objects contain the same data. Reference identity comparison (`is`) checks whether two tags point to the exact same heap memory block.
+* **Associativity and Precedence:** Operational priority runs from parenthetical bounds, to exponential powers (`**`), to multiplication/division groups, down to additive groups and logical structures.
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B5 (Nageswara Rao):** Chapter 4 ("Operators in Python") — Arithmetic, Assignment, Unary, Relational, Logical, Bitwise, Membership, and Identity Operators (pp. 71–86); Precedence Table (pp. 87–88).
+    * **B1 (John M. Zelle):** Chapter 3 — Numeric Operations; Chapter 8 — Boolean Expressions, logical precedence, short-circuit evaluation.
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Prove short-circuit evaluation patterns and contrast equality with identity using the Python interpreter:
+
+    ```python
+    # Short-Circuit Evaluation Returns the evaluated object
+    print("" or "Default")    # Output: 'Default' (Empty string is falsy, returns right operand)
+    print("User" or "Default")  # Output: 'User' (Fails safe early, short-circuits on first truthy value)
+
+    # Value Equality vs. Identity Reference
+    list_a = [1, 2, 3]
+    list_b = [1, 2, 3]
+    print(list_a == list_b)  # Output: True  (The lists contain identical values)
+    print(list_a is list_b)  # Output: False (They reside at different heap memory addresses)
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 6: Under the Hood — The Python Compilation & Execution Pipeline
+
+### **Lesson Objective**
+Trace Python's hybrid compilation and execution pipeline under standard CPython, explaining the role of bytecode cached within `__pycache__` directories and disassembling stack operations inside the PVM.
+
+### **Core Concepts**
+* **The Translation Boundary:** Source code (`.py`) is compiled into host-agnostic, byte-sized instruction sets (bytecode cached as `.pyc` files under `__pycache__`).
+* **The Virtual Machine:** The PVM hosts an internal interpreter that translates bytecode instructions line-by-line into system-native machine assembly instructions dynamically at runtime.
+* **Stack-Based Execution:** Unlike register-based CPUs (and register-targeted C compilation), the PVM operates as a virtual stack-based evaluation machine.
+* **The `dis` Module:** The standard disassembler library exposes the raw stack operations used by the PVM.
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B5 (Nageswara Rao):** Chapter 1 ("Introduction to Python") — Execution of a Python Program (pp. 7–8); Viewing the Byte Code (pp. 9–10); Python Virtual Machine (pp. 11–12).
+    * **B1 (John M. Zelle):** Chapter 1 — Section 1.7 ("Inside a Python Program") (pp. 15–16).
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Import the built-in disassembler to inspect PVM bytecode operations for a simple addition statement:
+
+    ```python
+    import dis
+
+    def compute_sum(a, b):
+        return a + b
+
+    # Disassemble function to inspect PVM stack opcodes
+    dis.dis(compute_sum)
+    ```
+
+    **Expected Disassembly Trace Output on Whiteboard:**
+    ```text
+      2           0 LOAD_FAST                0 (a)          # Push parameter 'a' onto PVM stack
+                  2 LOAD_FAST                1 (b)          # Push parameter 'b' onto PVM stack
+                  4 BINARY_ADD                              # Pop both values, perform addition, push result
+                  6 RETURN_VALUE                            # Pop top of stack and return to caller
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## MODULE 7: Troubleshooting, Error Classifications, and Debugging
+
+### **Lesson Objective**
+Classify script failures systematically into compile-time (syntax), runtime (exceptions), and logical (semantic) errors, and read system traceback diagnostics to identify execution context scopes.
+
+### **Core Concepts**
+* **Syntax Errors:** Typos caught by the compiler before bytecode generation begins. If a syntax error is present, no instructions are executed.
+* **Runtime Exceptions:** Logical operations that fail during program execution (e.g., `TypeError`, `ZeroDivisionError`, `NameError`), terminating the execution stack immediately unless managed by exception blocks.
+* **Semantic (Logical) Errors:** Algorithmic failures. The program executes perfectly without crashing, but yields incorrect mathematical or analytical results.
+* **Tracebacks:** Interactive diagnostic summaries displaying the exact nested call stack frames that led to a runtime exception.
+
+<Accordions>
+  <Accordion title="📖 Reference Chapters & Readings">
+    * **B5 (Nageswara Rao):** Chapter 16 ("Exceptions") — Compile-Time, Runtime, and Logical Errors (pp. 421–424).
+    * **B1 (John M. Zelle):** Chapter 1 — Troubleshooting typos (pp. 17–18).
+    * **B2 (Al Sweigart):** Chapter 1 — Errors are Okay; Chapter 10 — Debugging, Tracebacks.
+  </Accordion>
+  <Accordion title="💻 Suggested Classroom Demonstration">
+    Trace a runtime traceback log live on screen, identifying the error type, target line, and function execution path:
+
+    ```python
+    def calculate_ratio(dividend, divisor):
+        return dividend / divisor
+
+    def execute_calculations():
+        numerator = 100
+        denominator = 0
+        # Will raise a runtime ZeroDivisionError exception
+        calculate_ratio(numerator, denominator)
+
+    execute_calculations()
+    ```
+
+    **Diagnostic Traceback Analysis:**
+    ```text
+    Traceback (most recent call last):
+      File "analysis.py", line 11, in <module>
+        execute_calculations()
+      File "analysis.py", line 8, in execute_calculations
+        calculate_ratio(numerator, denominator)
+      File "analysis.py", line 2, in calculate_ratio
+        return dividend / divisor
+    ZeroDivisionError: division by zero
+    ```
+
+    *Point out to the class that although the error crashed at Line 2, the variable configuration error originated in `execute_calculations` on Line 8.*
+  </Accordion>
+</Accordions>
