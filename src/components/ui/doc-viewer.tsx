@@ -20,8 +20,6 @@ export function DocViewer({
   const [iframeUrl, setIframeUrl] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [invertDoc, setInvertDoc] = useState<boolean>(false);
-
-  // 🟢 NEW: Track if we are hitting the localhost limitation
   const [isLocalDevError, setIsLocalDevError] = useState<boolean>(false);
 
   useEffect(() => {
@@ -36,19 +34,24 @@ export function DocViewer({
       const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
       const fileExtension = url.split('.').pop()?.toLowerCase() || '';
       const isPdf = fileExtension === "pdf";
-      const absoluteAssetUrl = url.startsWith("http") ? url : `${window.location.origin}${url}`;
+      
+      // 🟢 FIX: Ensure absolute URL construction works perfectly on Netlify production
+      const cleanUrl = url.startsWith("http") ? url : `${window.location.origin}${url}`;
 
       if (isLocal && isPdf && !forceGoogleDocs) {
         // Safe: Browsers can render local PDFs directly
         setIframeUrl(`${url}#toolbar=1&navpanes=0&scrollbar=0`);
       } else if (isLocal && !url.startsWith("http")) {
-        // 🟢 NEW: It's a local Word/Excel file. Google can't reach it. 
-        // Stop the iframe and show our custom fallback UI.
+        // Local Word/Excel file limitation notice
         setIsLocalDevError(true);
         setIsLoading(false);
       } else {
-        // Safe: It's deployed, OR it's an external public URL. Send to Google.
-        setIframeUrl(`https://docs.google.com/viewer?url=${encodeURIComponent(absoluteAssetUrl)}&embedded=true`);
+        // 🟢 FIX: Use Microsoft Office Web Viewer alongside Google Viewer for robust multi-format production rendering
+        if (fileExtension === "docx" || fileExtension === "xlsx" || fileExtension === "pptx") {
+          setIframeUrl(`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(cleanUrl)}`);
+        } else {
+          setIframeUrl(`https://docs.google.com/viewer?url=${encodeURIComponent(cleanUrl)}&embedded=true`);
+        }
       }
     }
   }, [url, forceGoogleDocs]);
@@ -62,7 +65,7 @@ export function DocViewer({
   return (
     <div className="not-prose my-6 w-full rounded-xl border border-border bg-card p-4 shadow-sm transition-all duration-300 hover:shadow-md">
 
-      {/* Action Bar (Unchanged) */}
+      {/* Action Bar */}
       <div className="flex flex-col gap-3 border-b border-border pb-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2.5 min-w-0 w-full sm:w-auto">
           <DocumentIcon extension={fileExtension} />
@@ -97,25 +100,19 @@ export function DocViewer({
       <div className="relative w-full overflow-hidden rounded-lg border border-border bg-background shadow-inner h-[500px] sm:h-[600px] lg:h-[750px]">
 
         {isLoading && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm z-10 animate-pulse">
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm z-10">
             <div className="h-8 w-8 rounded-full border-4 border-primary border-t-transparent animate-spin mb-4" />
-            <span className="text-xs font-medium text-muted-foreground tracking-wide">
-              Connecting to document pipeline...
+            <span className="text-xs font-medium text-muted-foreground tracking-wide animate-pulse">
+              Loading the document...
             </span>
           </div>
         )}
 
-        {/* 🟢 NEW: Local Development Fallback UI */}
         {isLocalDevError && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-muted/30 p-6 text-center">
-            <div className="p-4 rounded-full bg-background border border-border mb-4 shadow-sm">
-              <svg className="size-8 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-              </svg>
-            </div>
             <h4 className="text-lg font-semibold text-foreground mb-2">Dev Mode: Preview Unavailable</h4>
             <p className="text-sm text-muted-foreground max-w-md mb-6">
-              Google Docs Viewer cannot access files hosted on localhost. This document will render automatically once deployed to production.
+              External viewers cannot access files hosted on localhost. This document will render automatically once deployed to Netlify.
             </p>
             <a
               href={url}
