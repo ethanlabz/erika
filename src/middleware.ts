@@ -11,9 +11,7 @@ export async function middleware(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
+        getAll() { return request.cookies.getAll() },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
           supabaseResponse = NextResponse.next({ request })
@@ -27,21 +25,27 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
   
-  const isLoginPage = request.nextUrl.pathname.startsWith('/login')
-  const isAuthCallback = request.nextUrl.pathname.startsWith('/auth/callback')
+  const pathname = request.nextUrl.pathname
+  
+  // 🟢 STRICT TARGETING: Only these specific paths trigger logic
+  const isDocsPage = pathname.startsWith('/docs')
+  const isLoginPage = pathname.startsWith('/login')
 
-  if (!user && !isLoginPage && !isAuthCallback) {
+  // 1. Unauthenticated users trying to access docs get sent to login
+  if (!user && isDocsPage) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
   }
 
+  // 2. Authenticated users trying to access login get sent to home
   if (user && isLoginPage) {
     const url = request.nextUrl.clone()
-    url.pathname = '/docs'
+    url.pathname = '/'
     return NextResponse.redirect(url)
   }
 
+  // 3. Everyone else (including root '/' visitors) passes through untouched
   return supabaseResponse
 }
 

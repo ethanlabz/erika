@@ -161,11 +161,63 @@
 
 }
 
+
+/* ==========================================================================
+   DYNAMIC DOCS THEMING (Tailwind v4 + Fumadocs Fix)
+   ========================================================================== */
+
+/* --- CORE (Teal/Cyan - Accent 4) --- */
+html[data-theme="core"] {
+  --active-accent: var(--accent4);
+  --active-accent-muted: var(--am4);
+  --color-fd-primary: var(--accent4);
+  --mdx-icon-color: var(--accent4);
+  
+  /* Tailwind v4 needs the fully formed hsl() color */
+  --primary: var(--accent4);
+  
+  /* Fumadocs needs the raw channels for opacity math */
+  --fd-primary: 187 90% 42%;
+}
+html.dark[data-theme="core"] {
+  --fd-primary: 190 95% 68%;
+}
+
+/* --- LABS (Mint/Green - Accent 3) --- */
+html[data-theme="labs"] {
+  --active-accent: var(--accent3);
+  --active-accent-muted: var(--am3);
+  --color-fd-primary: var(--accent3);
+  --mdx-icon-color: var(--accent3);
+  
+  --primary: var(--accent3);
+  --fd-primary: 142 72% 40%;
+}
+html.dark[data-theme="labs"] {
+  --fd-primary: 150 85% 65%;
+}
+
+/* --- PROJECTS (Gold/Amber - Accent 1) --- */
+html[data-theme="projects"] {
+  --active-accent: var(--accent1);
+  --active-accent-muted: var(--am1);
+  --color-fd-primary: var(--accent1);
+  --mdx-icon-color: var(--accent1);
+  
+  --primary: var(--accent1);
+  --fd-primary: 38 92% 50%;
+}
+html.dark[data-theme="projects"] {
+  --fd-primary: 43 96% 64%;
+}
+
+
 /* ==========================================================================
    UTILITY ENGINES & KEYFRAMES
    ========================================================================== */
 html {
   scrollbar-gutter: stable;
+  scroll-behavior: smooth; /* Smooth scrolling for anchor links */
 }
 
 html > body[data-scroll-locked] {

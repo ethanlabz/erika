@@ -1,12 +1,30 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { createClient } from "@/lib/supabase/server";
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  // 1. Server-side check to see if the user is currently authenticated
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
   return (
-    /* 🟢 FIX: Swapped relative for fixed inset-0 and locked dimensions with w-screen h-dvh. 
+    /* Swapped relative for fixed inset-0 and locked dimensions with w-screen h-dvh. 
        This cuts off all document layout bleed and eliminates the scrollbar completely. */
     <div className="fixed inset-0 h-dvh w-screen bg-background text-foreground flex flex-col items-center justify-center overflow-hidden px-4 md:px-6 select-none z-0">
       
+      {/* --- NEW: Minimalist Absolute Navigation Bar --- */}
+      <nav className="absolute top-0 left-0 w-full h-16 flex items-center justify-end px-6 z-50">
+        {!user ? (
+          <Button href="/login" variant="outline" size="sm" className="font-medium">
+            Sign In
+          </Button>
+        ) : (
+          <Button href="/docs/" variant="ghost" size="sm" className="font-medium text-muted-foreground hover:text-foreground">
+            Enter Vault &rarr;
+          </Button>
+        )}
+      </nav>
+
       {/* 1. ARCHITECTURAL BACKGROUND: Modern Minimalist Tech Grid Mesh */}
       <div className="absolute inset-0 z-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-size-[32px_32px] mask-[radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]" />
       
@@ -35,12 +53,15 @@ export default function LandingPage() {
 
         {/* Master Call To Action Controls Grid */}
         <div className="flex items-center gap-3.5 flex-wrap justify-center w-full animate-fade-in-up flex-direction-column uppercase">
-          <Button href="/docs/" size="lg" variant="default">
-            Explore The Documentation
-          </Button>
-          {/* <Button href="/docs/vi" size="lg" variant="outline" disabled>
-            Semester VI
-          </Button> */}
+          {!user ? (
+            <Button href="/login" size="lg" variant="default">
+              Sign In To Access
+            </Button>
+          ) : (
+            <Button href="/docs/" size="lg" variant="default">
+              Explore The Documentation
+            </Button>
+          )}
         </div>
 
       </div>
