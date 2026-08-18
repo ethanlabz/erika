@@ -1,0 +1,62 @@
+---
+title: Experiment 1
+---
+
+## Aim of the experiment
+> To set up the Python runtime environment, configure an IDE, and write scripts to test basic syntax, variable declarations, and debugging methods.
+
+
+## Theory
+Python is a popular programming language, widely used for web development, software development, mathematics, and system scripting. Setting up Python requires installing the runtime environment from python.org and configuring an Integrated Development Environment (IDE) like VS Code or PyCharm.
+
+In Python, variables are created the moment you assign a value to them, without needing to declare their data types beforehand (dynamic typing). Python has several built-in basic data types, including:
+*   **Text Type:** `str`
+*   **Numeric Types:** `int`, `float`, `complex`
+*   **Boolean Type:** `bool`
+
+Python supports basic arithmetic operators (`+`, `-`, `*`, `/`) and explicit type casting using constructor functions like `int()`, `float()`, and `str()`.
+
+
+## Code(if needed)
+```python
+# Variable declarations and dynamic typing
+integer_val = 10          # int
+float_val = 20.5          # float
+string_val = "Python"     # str
+boolean_val = True        # bool
+
+print("Variable Types and Values:")
+print(f"integer_val: {integer_val} | Type: {type(integer_val)}")
+print(f"float_val: {float_val} | Type: {type(float_val)}")
+print(f"string_val: '{string_val}' | Type: {type(string_val)}")
+print(f"boolean_val: {boolean_val} | Type: {type(boolean_val)}")
+
+# Arithmetic operations
+sum_val = integer_val + float_val
+print(f"\nArithmetic Operation: {integer_val} + {float_val} = {sum_val}")
+
+# Type casting
+casted_val = int(float_val)
+print(f"Type Casting: float to int: {float_val} -> {casted_val}")
+```
+
+
+## Commands & Output
+```bash
+python3 exp1.py
+```
+
+```text
+Variable Types and Values:
+integer_val: 10 | Type: <class 'int'>
+float_val: 20.5 | Type: <class 'float'>
+string_val: 'Python' | Type: <class 'str'>
+boolean_val: True | Type: <class 'bool'>
+
+Arithmetic Operation: 10 + 20.5 = 30.5
+Type Casting: float to int: 20.5 -> 20
+```
+
+
+## Conclusion
+> The Python runtime environment was successfully set up and configured. We verified basic syntax rules, dynamic variable typing, standard mathematical operations, and explicit type casting in Python.

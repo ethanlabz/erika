@@ -46,6 +46,6 @@
   },
   "allowScripts": {
     "sharp@0.34.5": true,
-    "esbuild@0.28.0": true
+    "esbuild@0.28.2": true
   }
 }
