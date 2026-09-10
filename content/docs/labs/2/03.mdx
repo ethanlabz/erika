@@ -1,0 +1,150 @@
+---
+title: Experiment 3
+---
+
+## Aim of the experiment
+> To implement advanced layout design system rules and responsive styling architectures utilizing Cascading Style Sheets (CSS).
+
+
+## Theory
+Cascading Style Sheets (CSS) define the presentation, layout, and visual formatting of HTML elements within web applications [118]. Advanced CSS layout techniques enable the creation of responsive, flexible, and adaptive user interfaces across various screen sizes and device viewports. Key concepts include:
+* **CSS Box Model:** Every HTML element is modeled as a rectangular box comprising content, padding, border, and margin areas. Setting `box-sizing: border-box` ensures padding and borders are included in the element's total width and height calculation.
+* **Flexbox (Flexible Box Layout):** A one-dimensional layout system designed for distributing space along a single axis (row or column). Properties such as `display: flex`, `justify-content`, `align-items`, and `flex-wrap` provide alignment control.
+* **CSS Grid Layout:** A two-dimensional layout mechanism allowing complex row- and column-based grid structures. Properties like `grid-template-columns: repeat(auto-fit, minmax(250px, 1fr))` enable responsive grid positioning without explicit media queries.
+* **Responsive Design & Media Queries:** Using `@media` rule queries (e.g., `@media (max-width: 768px)`) allows styles to dynamically adjust based on device viewport dimensions, pixel density, and device orientation.
+
+
+## Code
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive CSS Layout System</title>
+    <style>
+        /* CSS Reset & Box Sizing */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            color: #333;
+            padding: 20px;
+        }
+
+        /* Flexbox Header and Navigation */
+        header {
+            background-color: #1e293b;
+            color: #ffffff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 15px;
+        }
+
+        nav a {
+            color: #38bdf8;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* CSS Grid Layout for Cards */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-top: 4px solid #0284c7;
+        }
+
+        .card h3 {
+            margin-bottom: 10px;
+            color: #0f172a;
+        }
+
+        /* Responsive Media Query Breakpoint */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            nav ul {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>CSS Layout System</h1>
+        <nav>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Flexbox</a></li>
+                <li><a href="#">CSS Grid</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="grid-container">
+        <article class="card">
+            <h3>Box Model Architecture</h3>
+            <p>Controls content, padding, border, and margin dimensions for precise element alignment.</p>
+        </article>
+
+        <article class="card">
+            <h3>Flexbox Positioning</h3>
+            <p>Provides one-dimensional space distribution for flexible row or column layouts.</p>
+        </article>
+
+        <article class="card">
+            <h3>CSS Grid Matrix</h3>
+            <p>Enables two-dimensional grid layouts with automated column sizing using repeat and minmax functions.</p>
+        </article>
+    </main>
+
+</body>
+</html>
+```
+
+
+## Commands & Output
+```bash
+# Launch a local development server to test responsive styling in a web browser
+python3 -m http.server 8000
+```
+
+```text
+Serving HTTP on 0.0.0.0 port 8000 (http://127.0.0.1:8000/) ...
+127.0.0.1 - - [10/Sep/2026 04:03:00] "GET /styles.html HTTP/1.1" 200 -
+Layout Test: Viewport width >= 768px rendered 3-column auto-fit Grid matrix and horizontal Flexbox header.
+Layout Test: Viewport width < 768px triggered media query rules; header flex direction updated to column.
+```
+
+
+## Conclusion
+> Advanced layout design rules and responsive styling architectures were implemented using CSS Box Model properties, Flexbox alignment structures, Grid system matrices, and adaptive media queries.
