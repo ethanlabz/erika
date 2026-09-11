@@ -3,19 +3,19 @@ title: Experiment 2
 ---
 
 ## Aim of the experiment
-> To build a dynamic front-end web interface using semantic HTML markup embedded with interactive JavaScript client-side scripts.
+> To build a dynamic front-end web interface using semantic HTML markup embedded with interactive JavaScript client-side scripts served via a Node.js web server.
 
 
 ## Theory
-Semantic HTML structural elements (`<header>`, `<nav>`, `<main>`, `<section>`, `<article>`, `<footer>`) define the structure and layout of modern web documents, providing clear meaning to browsers and accessibility tools [118].
-Client-side JavaScript provides interactive functionality by dynamically manipulating the Document Object Model (DOM) [14, 118]. Key concepts include:
-* **DOM Tree Manipulation:** Accessing and modifying HTML document elements, attributes, and styles at runtime using methods like `document.getElementById()` and `element.addEventListener()`.
-* **Event-Driven Programming:** Registering event listeners to capture user interaction triggers such as button clicks, keyboard inputs, or form submissions (`click`, `submit`, `input`).
-* **Dynamic Content Updating:** Modifying element properties such as `.textContent`, `.innerHTML`, or CSS class lists to reflect state changes without requiring a full browser page refresh.
+Semantic HTML structural elements (`<header>`, `<nav>`, `<main>`, `<section>`, `<article>`, `<footer>`) define the structure and layout of modern web documents, providing clear meaning to browsers and accessibility tools.
+Client-side JavaScript provides interactive functionality by dynamically manipulating the Document Object Model (DOM). Node.js serves as the runtime environment to host and serve the front-end web application asynchronously. Key concepts include:
+- **DOM Tree Manipulation:** Accessing and modifying HTML document elements, attributes, and styles at runtime using methods like `document.getElementById()` and `element.addEventListener()`.
+- **Event-Driven Programming:** Registering event listeners to capture user interaction triggers such as button clicks, keyboard inputs, or form submissions (`click`, `submit`, `input`).
+- **Node.js Web Hosting:** Utilizing Node.js core HTTP and File System (`fs`) modules to deliver HTML, CSS, and client-side JavaScript files to client browsers without relying on external web servers.
 
 
 ## Code
-```html
+```html title="index.html"
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -78,20 +78,48 @@ Client-side JavaScript provides interactive functionality by dynamically manipul
 </html>
 ```
 
+```js title="server.js"
+// Node.js HTTP Server to deliver front-end semantic HTML assets
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
 
-## Commands & Output
-```bash
-# Open index.html in web browser or launch using a local HTTP server
-python3 -m http.server 8000
+const PORT = 3000;
+const HOST = '127.0.0.1';
+
+const server = http.createServer((req, res) => {
+    let filePath = path.join(__dirname, 'public', req.url === '/' ? 'index.html' : req.url);
+    
+    fs.readFile(filePath, (err, content) => {
+        if (err) {
+            res.writeHead(404, { 'Content-Type': 'text/plain' });
+            res.end('404 Not Found');
+        } else {
+            res.writeHead(200, { 'Content-Type': 'text/html' });
+            res.end(content, 'utf-8');
+        }
+    });
+});
+
+server.listen(PORT, HOST, () => {
+    console.log(`Node.js Server hosting interface at http://${HOST}:${PORT}/`);
+});
 ```
 
-```text
-Serving HTTP on 0.0.0.0 port 8000 (http://127.0.0.1:8000/) ...
-127.0.0.1 - - [10/Sep/2026 03:55:00] "GET /index.html HTTP/1.1" 200 -
+
+## Commands & Output
+```bash title="Terminal"
+# Start the Node.js web server hosting the front-end interface
+node server.js
+```
+
+```bash title="Output"
+Node.js Server hosting interface at http://127.0.0.1:3000/
+[HTTP 200] Served /index.html to client browser.
 DOM Event Execution: User input 'John Doe' captured via click event on #greetBtn.
 DOM Update: #displayMessage text updated to 'Welcome to the application, John Doe!'.
 ```
 
 
 ## Conclusion
-> The dynamic web interface was successfully created using semantic HTML elements for structure and client-side JavaScript for interactive DOM manipulation and event handling.
+> The dynamic web interface was successfully created using semantic HTML elements for structure, client-side JavaScript for interactive DOM manipulation, and Node.js for static file hosting.

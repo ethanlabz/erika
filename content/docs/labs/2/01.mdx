@@ -3,80 +3,132 @@ title: Experiment 1
 ---
 
 ## Aim of the experiment
-> To architect and test fundamental client-server execution scripts ensuring active communication loops between local network nodes.
+> To architect and test fundamental client-server execution scripts ensuring active communication loops between local network nodes using JavaScript and Node.js.
 
 
 ## Theory
-Client-server architecture is a distributed application structure that partitions tasks or workloads between service providers (servers) and service requesters (clients).
-* **Client Node:** The client initiates communication by sending an HTTP/TCP request to the server, specifying the requested resource, parameters, or headers.
-* **Server Node:** The server continuously listens on a designated port (e.g., port 80 or 8000), accepts incoming client socket connections, processes the payload, and sends back an HTTP response containing status codes and data.
-* **Execution Loop:** In web development, server-side scripts (such as PHP) parse client metadata provided in superglobal variables (`$_SERVER`), process logic, and deliver dynamic responses back to the client terminal or browser environment.
+Client-server architecture is a distributed application structure that partitions workloads between service providers (servers) and service requesters (clients).
+* **Server Node (Node.js):** Uses Node.js built-in modules (such as `http`) to create an asynchronous, event-driven server listening on a designated network port (e.g., port 3000). It processes incoming request streams, extracts request metadata, and dispatches structured responses.
+* **Client Node (JavaScript/Node.js):** Initiates asynchronous HTTP requests to the server node using JavaScript APIs such as `fetch()` or Node.js native `http.request()` modules.
+* **Event-Driven Execution Loop:** Node.js operates on a single-threaded non-blocking I/O event loop, allowing the server node to handle multiple client socket connections concurrently without blocking thread execution.
 
 
 ## Code
-```php
-<?php
-// client_server_test.php
-// Server-side script handling client request parameters and metadata
+```js title="server.js"
+// Node.js HTTP Server Node handling incoming client requests
+const http = require('http');
 
-header("Content-Type: text/plain");
+const PORT = 3000;
+const HOST = '127.0.0.1';
 
-// Extract client request headers and environmental metadata
-$clientIP      = $_SERVER['REMOTE_ADDR']     ?? '127.0.0.1';
-$requestMethod = $_SERVER['REQUEST_METHOD']  ?? 'GET';
-$userAgent     = $_SERVER['HTTP_USER_AGENT'] ?? 'CLI Client';
-$timestamp     = date('Y-m-d H:i:s');
+const server = http.createServer((req, res) => {
+    // Extract request details
+    const clientIP = req.socket.remoteAddress;
+    const method = req.method;
+    const url = req.url;
+    const timestamp = new Date().toISOString();
 
-// Generate structured response payload
-echo "===========================================\n";
-echo "      CLIENT-SERVER COMMUNICATION LOG      \n";
-echo "===========================================\n";
-echo "Server Status   : ACTIVE (Port 8000)\n";
-echo "Timestamp       : " . $timestamp . "\n";
-echo "Client IP       : " . $clientIP . "\n";
-echo "Request Method  : " . $requestMethod . "\n";
-echo "User Agent      : " . $userAgent . "\n";
-echo "-------------------------------------------\n";
+    console.log(`[${timestamp}] Received ${method} request for ${url} from ${clientIP}`);
 
-if ($requestMethod === 'GET') {
-    echo "Server Response : 200 OK - Active communication loop verified.\n";
-} else {
-    echo "Server Response : Processed " . $requestMethod . " request payload.\n";
-}
-echo "===========================================\n";
-?>
+    // Set HTTP response headers
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+
+    // Construct response payload
+    const responseData = {
+        status: 'SUCCESS',
+        message: 'Active communication loop verified with Server Node',
+        timestamp: timestamp,
+        clientMetadata: {
+            ip: clientIP,
+            method: method,
+            endpoint: url,
+            userAgent: req.headers['user-agent']
+        }
+    };
+
+    // Send JSON response payload
+    res.end(JSON.stringify(responseData, null, 2));
+});
+
+server.listen(PORT, HOST, () => {
+    console.log(`Server Node running at http://${HOST}:${PORT}/`);
+});
 ```
 
+```js title="client.js"
+// Node.js Client Node initiating an asynchronous request to the server
+const http = require('http');
+
+const options = {
+    hostname: '127.0.0.1',
+    port: 3000,
+    path: '/api/status',
+    method: 'GET',
+    headers: {
+        'User-Agent': 'NodeJS-Client-Node/1.0'
+    }
+};
+
+console.log(`Client Node: Initiating HTTP GET request to http://${options.hostname}:${options.port}${options.path}...`);
+
+const req = http.request(options, (res) => {
+    let rawData = '';
+
+    console.log(`Client Node: Server Response Received | Status Code: ${res.statusCode}`);
+
+    res.on('data', (chunk) => {
+        rawData += chunk;
+    });
+
+    res.on('end', () => {
+        try {
+            const parsedData = JSON.parse(rawData);
+            console.log('Client Node: Decoded JSON Response Payload:');
+            console.log(JSON.stringify(parsedData, null, 2));
+        } catch (e) {
+            console.error(`Error parsing response: ${e.message}`);
+        }
+    });
+});
+
+req.on('error', (e) => {
+    console.error(`Client Node Request Error: ${e.message}`);
+});
+
+req.end();
+```
 
 ## Commands & Output
-```bash
-# Start local development server on port 8000
-php -S localhost:8000 client_server_test.php &
+```bash title="Commands"
+# Terminal 1: Start the Node.js Server Node
+node server.js
 
-# Execute client request via cURL command-line tool
-curl -i http://localhost:8000/
+# Terminal 2: Execute the Node.js Client Node script
+node client.js
 ```
 
-```text
-HTTP/1.1 200 OK
-Host: localhost:8000
-Date: Mon, 10 Aug 2026 22:55:00 GMT
-Connection: close
-Content-Type: text/plain; charset=UTF-8
+```bash title="Output"
+# Terminal 1 (Server Console):
+Server Node running at http://127.0.0.1:3000/
+[2026-09-10T23:35:00.123Z] Received GET request for /api/status from 127.0.0.1
 
-===========================================
-      CLIENT-SERVER COMMUNICATION LOG      
-===========================================
-Server Status   : ACTIVE (Port 8000)
-Timestamp       : 2026-08-10 22:55:00
-Client IP       : 127.0.0.1
-Request Method  : GET
-User Agent      : curl/7.81.0
--------------------------------------------
-Server Response : 200 OK - Active communication loop verified.
-===========================================
+# Terminal 2 (Client Console):
+Client Node: Initiating HTTP GET request to http://127.0.0.1:3000/api/status...
+Client Node: Server Response Received | Status Code: 200
+Client Node: Decoded JSON Response Payload:
+{
+  "status": "SUCCESS",
+  "message": "Active communication loop verified with Server Node",
+  "timestamp": "2026-09-10T23:35:00.123Z",
+  "clientMetadata": {
+    "ip": "127.0.0.1",
+    "method": "GET",
+    "endpoint": "/api/status",
+    "userAgent": "NodeJS-Client-Node/1.0"
+  }
+}
 ```
 
 
 ## Conclusion
-> The practical implementation successfully demonstrates client-server execution mechanics by establishing a local server instance, handling incoming HTTP GET requests, and outputting server-side environment metadata.
+> The practical implementation successfully demonstrates client-server communication mechanics using Node.js and JavaScript, establishing an asynchronous server event loop and handling HTTP requests and JSON payloads from a client node.

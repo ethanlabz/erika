@@ -8,6 +8,7 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { DocViewer } from '@/components/ui/doc-viewer';
 import { ExecutionSimulator } from '@/components/ui/execution-simulator';
 import { Quiz } from '@/components/ui/quiz';
+import { CodeTabs } from '@/components/animate-ui/components/animate/code-tabs';
 
 export function getMDXComponents(components?: MDXComponents) {
   return {
@@ -29,6 +30,10 @@ export function getMDXComponents(components?: MDXComponents) {
 
     // interactive quiz
     Quiz,
+
+    // code tabs
+    CodeTabs,
+    
   } satisfies MDXComponents;
 }
 
