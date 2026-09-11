@@ -1,0 +1,82 @@
+---
+title: Experiment 1
+---
+
+## Aim of the experiment
+> To architect and test fundamental client-server execution scripts ensuring active communication loops between local network nodes.
+
+
+## Theory
+Client-server architecture is a distributed application structure that partitions tasks or workloads between service providers (servers) and service requesters (clients).
+* **Client Node:** The client initiates communication by sending an HTTP/TCP request to the server, specifying the requested resource, parameters, or headers.
+* **Server Node:** The server continuously listens on a designated port (e.g., port 80 or 8000), accepts incoming client socket connections, processes the payload, and sends back an HTTP response containing status codes and data.
+* **Execution Loop:** In web development, server-side scripts (such as PHP) parse client metadata provided in superglobal variables (`$_SERVER`), process logic, and deliver dynamic responses back to the client terminal or browser environment.
+
+
+## Code
+```php
+<?php
+// client_server_test.php
+// Server-side script handling client request parameters and metadata
+
+header("Content-Type: text/plain");
+
+// Extract client request headers and environmental metadata
+$clientIP      = $_SERVER['REMOTE_ADDR']     ?? '127.0.0.1';
+$requestMethod = $_SERVER['REQUEST_METHOD']  ?? 'GET';
+$userAgent     = $_SERVER['HTTP_USER_AGENT'] ?? 'CLI Client';
+$timestamp     = date('Y-m-d H:i:s');
+
+// Generate structured response payload
+echo "===========================================\n";
+echo "      CLIENT-SERVER COMMUNICATION LOG      \n";
+echo "===========================================\n";
+echo "Server Status   : ACTIVE (Port 8000)\n";
+echo "Timestamp       : " . $timestamp . "\n";
+echo "Client IP       : " . $clientIP . "\n";
+echo "Request Method  : " . $requestMethod . "\n";
+echo "User Agent      : " . $userAgent . "\n";
+echo "-------------------------------------------\n";
+
+if ($requestMethod === 'GET') {
+    echo "Server Response : 200 OK - Active communication loop verified.\n";
+} else {
+    echo "Server Response : Processed " . $requestMethod . " request payload.\n";
+}
+echo "===========================================\n";
+?>
+```
+
+
+## Commands & Output
+```bash
+# Start local development server on port 8000
+php -S localhost:8000 client_server_test.php &
+
+# Execute client request via cURL command-line tool
+curl -i http://localhost:8000/
+```
+
+```text
+HTTP/1.1 200 OK
+Host: localhost:8000
+Date: Mon, 10 Aug 2026 22:55:00 GMT
+Connection: close
+Content-Type: text/plain; charset=UTF-8
+
+===========================================
+      CLIENT-SERVER COMMUNICATION LOG      
+===========================================
+Server Status   : ACTIVE (Port 8000)
+Timestamp       : 2026-08-10 22:55:00
+Client IP       : 127.0.0.1
+Request Method  : GET
+User Agent      : curl/7.81.0
+-------------------------------------------
+Server Response : 200 OK - Active communication loop verified.
+===========================================
+```
+
+
+## Conclusion
+> The practical implementation successfully demonstrates client-server execution mechanics by establishing a local server instance, handling incoming HTTP GET requests, and outputting server-side environment metadata.

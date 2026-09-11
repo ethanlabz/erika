@@ -1,0 +1,73 @@
+---
+title: Experiment 3
+---
+
+## Aim of the experiment
+> To create modular software architectures using custom functions, parameter passing, lambda functions, and recursive logic.
+
+
+## Theory
+A function is a block of code which only runs when it is called. You can pass data, known as parameters, into a function. A function can return data as a result.
+
+In Python:
+*   **Defining Functions:** Functions are defined using the `def` keyword.
+*   **Arguments and Parameters:** Information can be passed into functions as arguments. Python supports positional arguments, keyword arguments, and default parameter values.
+*   **Recursion:** Python accepts function recursion, which means a defined function can call itself. Recursion requires a base case to prevent infinite execution loops.
+*   **Lambda Functions:** A lambda function is a small anonymous function. A lambda function can take any number of arguments, but can only have one expression. The syntax is: `lambda arguments : expression`.
+
+
+## Code(if needed)
+```python
+# Experiment 3: Functions, Recursion, and Lambda Functions
+
+# 1. Custom function with parameters and default values
+def calculate_area(length, width=5):
+    """Calculates the area of a rectangle."""
+    return length * width
+
+# 2. Recursive function to compute factorial
+def recursive_factorial(n):
+    """Computes factorial of a number using recursion."""
+    if n == 0 or n == 1:
+        return 1
+    else:
+        return n * recursive_factorial(n - 1)
+
+# 3. Lambda function for inline computation
+square = lambda x: x ** 2
+
+# Main execution
+print("1. Custom Function with parameters:")
+print(f"Area with length=10, width=8: {calculate_area(10, 8)}")
+print(f"Area with length=10 (default width=5): {calculate_area(10)}")
+
+print("\n2. Recursive Logic:")
+num = 5
+print(f"Factorial of {num} is: {recursive_factorial(num)}")
+
+print("\n3. Inline Lambda Function:")
+value = 7
+print(f"Square of {value} using lambda: {square(value)}")
+```
+
+
+## Commands & Output
+```bash
+python3 exp3.py
+```
+
+```text
+1. Custom Function with parameters:
+Area with length=10, width=8: 80
+Area with length=10 (default width=5): 50
+
+2. Recursive Logic:
+Factorial of 5 is: 120
+
+3. Inline Lambda Function:
+Square of 7 using lambda: 49
+```
+
+
+## Conclusion
+> We successfully created modular Python scripts using functions, implemented recursive logic to compute factorials, and applied lambda functions for concise inline expressions.

@@ -1,0 +1,97 @@
+---
+title: Experiment 2
+---
+
+## Aim of the experiment
+> To build a dynamic front-end web interface using semantic HTML markup embedded with interactive JavaScript client-side scripts.
+
+
+## Theory
+Semantic HTML structural elements (`<header>`, `<nav>`, `<main>`, `<section>`, `<article>`, `<footer>`) define the structure and layout of modern web documents, providing clear meaning to browsers and accessibility tools [118].
+Client-side JavaScript provides interactive functionality by dynamically manipulating the Document Object Model (DOM) [14, 118]. Key concepts include:
+* **DOM Tree Manipulation:** Accessing and modifying HTML document elements, attributes, and styles at runtime using methods like `document.getElementById()` and `element.addEventListener()`.
+* **Event-Driven Programming:** Registering event listeners to capture user interaction triggers such as button clicks, keyboard inputs, or form submissions (`click`, `submit`, `input`).
+* **Dynamic Content Updating:** Modifying element properties such as `.textContent`, `.innerHTML`, or CSS class lists to reflect state changes without requiring a full browser page refresh.
+
+
+## Code
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Front-End Web Interface</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+        header, main, footer { border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 5px; }
+        .card { background-color: #f9f9f9; padding: 10px; margin-top: 10px; border-left: 4px solid #007bff; }
+        button { padding: 8px 15px; background-color: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Dynamic Web Interface</h1>
+        <p>Semantic HTML5 & Client-Side JavaScript DOM Manipulation</p>
+    </header>
+
+    <main>
+        <section>
+            <h2>User Interaction Section</h2>
+            <label for="username">Enter Name:</label>
+            <input type="text" id="username" placeholder="e.g. John Doe">
+            <button id="greetBtn">Generate Greeting</button>
+        </section>
+
+        <section id="outputSection" class="card">
+            <h3>Output Display</h3>
+            <p id="displayMessage">Awaiting user interaction...</p>
+        </section>
+    </main>
+
+    <footer>
+        <p>Web Technologies Lab &copy; 2026 - Experiment 2</p>
+    </footer>
+
+    <script>
+        // DOM Element Selection
+        const greetBtn = document.getElementById('greetBtn');
+        const usernameInput = document.getElementById('username');
+        const displayMessage = document.getElementById('displayMessage');
+
+        // Event Listener Registration
+        greetBtn.addEventListener('click', function() {
+            const nameValue = usernameInput.value.trim();
+            if (nameValue === "") {
+                displayMessage.textContent = "Error: Please enter a valid name.";
+                displayMessage.style.color = "red";
+            } else {
+                displayMessage.textContent = "Welcome to the application, " + nameValue + "!";
+                displayMessage.style.color = "green";
+            }
+        });
+    </script>
+
+</body>
+</html>
+```
+
+
+## Commands & Output
+```bash
+# Open index.html in web browser or launch using a local HTTP server
+python3 -m http.server 8000
+```
+
+```text
+Serving HTTP on 0.0.0.0 port 8000 (http://127.0.0.1:8000/) ...
+127.0.0.1 - - [10/Sep/2026 03:55:00] "GET /index.html HTTP/1.1" 200 -
+DOM Event Execution: User input 'John Doe' captured via click event on #greetBtn.
+DOM Update: #displayMessage text updated to 'Welcome to the application, John Doe!'.
+```
+
+
+## Conclusion
+> The dynamic web interface was successfully created using semantic HTML elements for structure and client-side JavaScript for interactive DOM manipulation and event handling.

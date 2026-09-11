@@ -1,0 +1,91 @@
+---
+title: Experiment 2
+---
+
+## Aim of the experiment
+> To implement control structures using conditional blocks (if-elif-else) and iterative loops (for, while) to resolve logical workflows.
+
+
+## Theory
+Python supports the standard logical conditions from mathematics:
+*   Equals: `a == b`
+*   Not Equals: `a != b`
+*   Less than: `a < b`
+*   Less than or equal to: `a <= b`
+*   Greater than: `a > b`
+*   Greater than or equal to: `a >= b`
+
+These conditions can be used in several ways, most commonly in "if statements" and loops.
+*   **if-elif-else Statement:** Used for conditional decision making. Python uses the keyword `elif` which is short for "else if", and `else` to catch anything that was not caught by the preceding conditions.
+*   **for Loop:** Used for iterating over a sequence (that is either a list, a tuple, a dictionary, a set, or a string) or a range of numbers.
+*   **while Loop:** Executes a set of statements as long as a condition is true.
+*   **Loop Control Statements:** The `break` statement stops the loop even if the condition is true. The `continue` statement stops the current iteration and continues with the next.
+
+
+## Code(if needed)
+```python
+# Experiment 2: Control structures and iterative loops
+
+# 1. Conditional block (if-elif-else)
+score = 85
+print("1. Conditional Block evaluation:")
+if score >= 90:
+    grade = 'A'
+elif score >= 80:
+    grade = 'B'
+elif score >= 70:
+    grade = 'C'
+else:
+    grade = 'D'
+print(f"Score: {score} -> Grade: {grade}\n")
+
+# 2. Iterative loop (for loop) to find prime numbers
+print("2. Iterating with 'for' loop (Prime numbers between 2 and 15):")
+for num in range(2, 16):
+    is_prime = True
+    for i in range(2, num):
+        if num % i == 0:
+            is_prime = False
+            break
+    if is_prime:
+        print(f"Prime: {num}")
+
+# 3. Iterative loop (while loop) with control modifiers
+print("\n3. Iterating with 'while' loop and control statements:")
+count = 1
+while count <= 5:
+    if count == 4:
+        print("Breaking loop at count 4")
+        break
+    print(f"Count: {count}")
+    count += 1
+```
+
+
+## Commands & Output
+```bash
+python3 exp2.py
+```
+
+```text
+1. Conditional Block evaluation:
+Score: 85 -> Grade: B
+
+2. Iterating with 'for' loop (Prime numbers between 2 and 15):
+Prime: 2
+Prime: 3
+Prime: 5
+Prime: 7
+Prime: 11
+Prime: 13
+
+3. Iterating with 'while' loop and control statements:
+Count: 1
+Count: 2
+Count: 3
+Breaking loop at count 4
+```
+
+
+## Conclusion
+> We successfully implemented conditional blocks and iterative loops in Python. We verified how indentation organizes structural blocks and how loop control statements like `break` alter the flow of execution.
