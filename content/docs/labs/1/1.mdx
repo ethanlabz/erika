@@ -7,19 +7,70 @@ title: Experiment 1
 
 
 ## Theory
-Python is a popular programming language, widely used for web development, software development, mathematics, and system scripting. Setting up Python requires installing the runtime environment from python.org and configuring an Integrated Development Environment (IDE) like VS Code or PyCharm.
 
-In Python, variables are created the moment you assign a value to them, without needing to declare their data types beforehand (dynamic typing). Python has several built-in basic data types, including:
-*   **Text Type:** `str`
-*   **Numeric Types:** `int`, `float`, `complex`
-*   **Boolean Type:** `bool`
+### Definition of CPython
+**CPython** is the default and reference implementation of the Python programming language [117, 126]. Written in C and Python, CPython serves as both an interpreter and runtime environment that compiles Python source code (`.py`) into intermediate bytecode before executing it on the CPython virtual machine [126]. It is the standard distribution provided and downloadable directly from python.org.
 
-Python supports basic arithmetic operators (`+`, `-`, `*`, `/`) and explicit type casting using constructor functions like `int()`, `float()`, and `str()`.
+---
+
+### 1. Installing CPython & Configuring PATH
+1. **Download CPython:** Download the standard installer from [python.org](https://www.python.org/).
+2. **Configure PATH (Crucial Step):** On the initial installation screen, select **"Add python.exe to PATH"** before clicking **"Install Now"**.
+   * *Why?* Registering Python in system environment variables enables VS Code, terminals, and command prompts to automatically discover and execute the Python interpreter.
+
+---
+
+### 2. Installing Visual Studio Code
+1. Download the installer from [code.visualstudio.com](https://code.visualstudio.com/).
+2. Run the installer using the default configuration settings.
+
+---
+
+### 3. Setting Up VS Code for Python
+
+#### Step A: Install the Official Python Extension
+1. Launch VS Code.
+2. Open the **Extensions** view from the left sidebar (`Ctrl+Shift+X` / `Cmd+Shift+X`).
+3. Search for **Python** and install the official extension published by **Microsoft** (provides IntelliSense, syntax highlighting, code auto-completion, and debugging).
+
+#### Step B: Select the Python Interpreter
+1. Open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`).
+2. Type and select **`Python: Select Interpreter`**.
+3. Choose the installed CPython environment (e.g., Python 3.x.x).
+
+---
+
+### 4. Writing and Running a Script in VS Code
+1. Create a new file via **File → New Text File** (`Ctrl+N`), then save it as `first_script.py` (`Ctrl+S`).
+2. Write a Python script to test syntax and variable declarations.
+3. **Execution Options:**
+   * **Play Button:** Click the green Run/Play icon in the top-right corner of VS Code.
+   * **Terminal Command:** Right-click inside the editor and choose **Run Python File in Terminal**.
+
+---
+
+### 5. Debugging in VS Code
+1. **Set a Breakpoint:** Click in the margin directly to the left of any line number to create a red breakpoint dot.
+2. **Start Debugging:** Press `F5` (or click **Run and Debug** on the left activity bar) and select **Python File**.
+3. **Step Through Code:**
+   * **Step Over (`F10`):** Executes the current line and moves to the next.
+   * **Step Into (`F11`):** Enters inside a function call.
+   * **Variables Panel:** Inspect live local and global variable states in the left panel while execution is paused.
+
+---
+
+### 6. Python Variables & Dynamic Typing Concepts
+In Python, variables are created automatically upon value assignment without explicit data type declarations (dynamic typing) [126]. Standard built-in basic data types include:
+* **Text Type:** `str`
+* **Numeric Types:** `int`, `float`, `complex`
+* **Boolean Type:** `bool`
+
+Python supports arithmetic operations (`+`, `-`, `*`, `/`) and explicit type casting via constructors (`int()`, `float()`, `str()`).
 
 
-## Code(if needed)
+## Code
 ```python
-# Variable declarations and dynamic typing
+# Variable declarations and dynamic typing demonstration
 integer_val = 10          # int
 float_val = 20.5          # float
 string_val = "Python"     # str
@@ -38,12 +89,19 @@ print(f"\nArithmetic Operation: {integer_val} + {float_val} = {sum_val}")
 # Type casting
 casted_val = int(float_val)
 print(f"Type Casting: float to int: {float_val} -> {casted_val}")
+
+# Student script demonstration in VS Code
+student_name = "Alex"
+score = 95
+
+print(f"\nStudent: {student_name}")
+print(f"Exam Score: {score}")
 ```
 
 
 ## Commands & Output
 ```bash
-python3 exp1.py
+python3 first_script.py
 ```
 
 ```text
@@ -55,8 +113,11 @@ boolean_val: True | Type: <class 'bool'>
 
 Arithmetic Operation: 10 + 20.5 = 30.5
 Type Casting: float to int: 20.5 -> 20
+
+Student: Alex
+Exam Score: 95
 ```
 
 
 ## Conclusion
-> The Python runtime environment was successfully set up and configured. We verified basic syntax rules, dynamic variable typing, standard mathematical operations, and explicit type casting in Python.
+> The CPython environment was installed with PATH configured correctly, and Visual Studio Code was fully configured using the official Python extension and selected interpreter. Script execution and debugging workflows (breakpoints, step-over, step-into, and live variable inspection) were verified alongside dynamic typing, arithmetic operations, and explicit type casting in Python.
