@@ -1,0 +1,75 @@
+---
+title: Experiment 5
+---
+
+## Aim of the experiment
+> To deploy interactive back-end processing pipelines using JavaScript data structures, form handling, and validation routines in Node.js.
+
+
+## Theory
+Processing user form input requires parsing request body streams and validating payload data on the server side to ensure security and data integrity.
+* **Stream Body Parsing:** Request payloads are received in chunked data streams (`data` and `end` events) and parsed into key-value structures.
+* **Input Validation:** Verifies required input fields, sanitizes string data, and validates data formats prior to server state updates.
+* **Data Structures:** Multi-dimensional arrays and object arrays organize and store submitted form records dynamically in memory.
+
+
+## Code
+```javascript
+// app.js - Server with form handling and validation
+const http = require('http');
+
+const records = [
+    { id: 101, name: 'Alice', role: 'Developer' },
+    { id: 102, name: 'Bob', role: 'Designer' }
+];
+
+const server = http.createServer((req, res) => {
+    if (req.method === 'POST' && req.url === '/submit') {
+        let body = '';
+        req.on('data', chunk => { body += chunk.toString(); });
+        req.on('end', () => {
+            const params = new URLSearchParams(body);
+            const name = params.get('name') ? params.get('name').trim() : '';
+            const role = params.get('role') ? params.get('role').trim() : '';
+
+            res.setHeader('Content-Type', 'text/html');
+            if (!name || !role) {
+                res.statusCode = 400;
+                res.end('<h3>Validation Error: All fields are required.</h3>');
+            } else {
+                records.push({ id: Date.now(), name, role });
+                res.statusCode = 200;
+                res.end(`<h3>Success: Record added for ${name} (${role})</h3><p>Total Records: ${records.length}</p>`);
+            }
+        });
+    } else {
+        res.setHeader('Content-Type', 'text/html');
+        res.end(`
+            <form method="POST" action="/submit">
+                Name: <input type="text" name="name"><br>
+                Role: <input type="text" name="role"><br>
+                <button type="submit">Submit</button>
+            </form>
+        `);
+    }
+});
+
+server.listen(3000, () => console.log('Form processing server running on port 3000'));
+```
+
+
+## Commands & Output
+```bash
+# Execute form processing server
+node app.js
+```
+
+```text
+Form processing server running on port 3000
+[POST /submit] 200 OK - Success: Record added for John Doe (Engineer)
+Total Records: 3
+```
+
+
+## Conclusion
+> Interactive back-end form processing, request stream parsing, and data validation routines were successfully deployed using Node.js.

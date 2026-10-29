@@ -1,0 +1,62 @@
+---
+title: Experiment 6
+---
+
+## Aim of the experiment
+> To engineer a secure multi-tiered web application environment by establishing stable Node.js connections to a persistent MySQL database.
+
+
+## Theory
+A multi-tiered web application isolates the presentation layer, business logic layer, and database persistence layer.
+* **Database Driver:** Driver client libraries (e.g., `mysql2`) connect Node.js applications asynchronously to MySQL database servers.
+* **Connection Pooling:** Manages reusable database connections to optimize resource usage and query throughput.
+* **Parameterized Queries:** Executes SQL operations safely using placeholders (`?`) to prevent SQL injection vulnerabilities.
+
+
+## Code
+```javascript
+// db_demo.js - Node.js MySQL Database Integration
+const mysql = require('mysql2');
+
+// Configure database connection pool
+const pool = mysql.createPool({
+    host: 'localhost',
+    user: 'root',
+    password: 'password',
+    database: 'test_db',
+    waitForConnections: true,
+    connectionLimit: 10
+});
+
+// Execute SQL query using parameterized placeholders
+pool.query('SELECT * FROM users WHERE status = ?', ['active'], (err, results) => {
+    if (err) {
+        console.error('Database Connection Error:', err.message);
+        return;
+    }
+    console.log('Database Connection Established.');
+    console.log('Active Records Count:', results.length);
+    console.log('Fetched Records:', results);
+    pool.end();
+});
+```
+
+
+## Commands & Output
+```bash
+# Execute database connection script
+node db_demo.js
+```
+
+```text
+Database Connection Established.
+Active Records Count: 2
+Fetched Records: [
+  { id: 1, name: 'Alice', status: 'active' },
+  { id: 2, name: 'Bob', status: 'active' }
+]
+```
+
+
+## Conclusion
+> A multi-tiered database connection architecture was established between Node.js and a persistent MySQL database, executing asynchronous parameterized queries securely.

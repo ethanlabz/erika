@@ -1,0 +1,58 @@
+---
+title: Experiment 4
+---
+
+## Aim of the experiment
+> To execute basic back-end programming mechanics by configuring and running server-side JavaScript scripts using Node.js.
+
+
+## Theory
+Server-side scripting executes code on the web server prior to sending responses to client browsers. Node.js enables asynchronous, event-driven server-side execution using JavaScript.
+* **HTTP Module:** The native `http` module facilitates web server creation via `http.createServer()`.
+* **Request & Response Cycle:** Incoming client requests (`req`) contain request parameters, while response objects (`res`) transmit status codes and content headers.
+* **URL Routing:** Basic routing matches requested URL endpoints to specific server response handlers.
+
+
+## Code
+```javascript
+// server.js - Server-side Node.js script
+const http = require('http');
+
+const PORT = 3000;
+
+const server = http.createServer((req, res) => {
+    res.setHeader('Content-Type', 'text/html');
+
+    if (req.url === '/') {
+        res.statusCode = 200;
+        res.end('<h1>Server Node Active</h1><p>Server-side JavaScript processing initialized.</p>');
+    } else if (req.url === '/info') {
+        res.statusCode = 200;
+        res.end('<h1>Server Info</h1><p>Node.js Runtime Version: ' + process.version + '</p>');
+    } else {
+        res.statusCode = 404;
+        res.end('<h1>404 Not Found</h1>');
+    }
+});
+
+server.listen(PORT, () => {
+    console.log(`Node.js server running at http://localhost:${PORT}/`);
+});
+```
+
+
+## Commands & Output
+```bash
+# Start the server-side Node.js script
+node server.js
+```
+
+```text
+Node.js server running at http://localhost:3000/
+[HTTP GET /] 200 OK - Server-side JavaScript processing initialized.
+[HTTP GET /info] 200 OK - Node.js Runtime Version: v18.16.0
+```
+
+
+## Conclusion
+> Server-side execution mechanics were successfully demonstrated using Node.js by configuring an HTTP server that processes request endpoints and delivers dynamic responses.

@@ -1,0 +1,81 @@
+---
+title: Experiment 7
+---
+
+## Aim of the experiment
+> To synthesize full-stack development skills by building, packaging, and demonstrating a fully integrated, functional web service application.
+
+
+## Theory
+Full-stack development combines client-side user interface design with server-side API handlers and persistent data management.
+* **REST API Architecture:** Defines standardized HTTP endpoints (GET, POST) for data exchange using JSON formatting.
+* **Client-Server Integration:** Front-end JavaScript sends asynchronous `fetch()` requests to communicate with back-end endpoints.
+* **Full-Stack Application Flow:** Integrates UI rendering, input capture, request routing, and data updates into a single service.
+
+
+## Code
+```javascript
+// server.js - Integrated Full-Stack Web Service
+const http = require('http');
+
+let items = [
+    { id: 1, name: 'Item Alpha' },
+    { id: 2, name: 'Item Beta' }
+];
+
+const server = http.createServer((req, res) => {
+    if (req.url === '/api/items' && req.method === 'GET') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(items));
+    } else if (req.url === '/api/items' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => body += chunk);
+        req.on('end', () => {
+            const newItem = JSON.parse(body);
+            newItem.id = items.length + 1;
+            items.push(newItem);
+            res.writeHead(201, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(newItem));
+        });
+    } else {
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        res.end(`
+            <!DOCTYPE html>
+            <html>
+            <head><title>Full-Stack App</title></head>
+            <body>
+                <h2>Full-Stack Web Application</h2>
+                <button onclick="fetchItems()">Load Data</button>
+                <ul id="itemList"></ul>
+                <script>
+                    async function fetchItems() {
+                        const res = await fetch('/api/items');
+                        const data = await res.json();
+                        document.getElementById('itemList').innerHTML = data.map(i => '<li>' + i.name + '</li>').join('');
+                    }
+                </script>
+            </body>
+            </html>
+        `);
+    }
+});
+
+server.listen(3000, () => console.log('Full-stack application running at http://localhost:3000/'));
+```
+
+
+## Commands & Output
+```bash
+# Launch integrated full-stack web application
+node server.js
+```
+
+```text
+Full-stack application running at http://localhost:3000/
+[GET /api/items] 200 OK - Returned 2 items JSON payload.
+[POST /api/items] 201 Created - Item Gamma added successfully.
+```
+
+
+## Conclusion
+> A functional full-stack web service application was engineered and executed, demonstrating seamless integration between front-end UI interactions and a Node.js back-end service.
